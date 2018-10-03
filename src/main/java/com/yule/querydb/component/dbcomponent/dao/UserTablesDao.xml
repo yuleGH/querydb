@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yule.querydb.component.dbcomponent.dao.UserTablesDao">
+
+    <sql id="Select_UserTablesList">
+        select t.table_name tableName, f.comments comments
+      from user_tables t
+     inner join user_tab_comments f
+        on t.table_name = f.table_name
+    </sql>
+
+    <!--查询当前用户下的所有表名，有限制-->
+    <select id="selectUserTablesListByTbName" resultType="com.yule.querydb.component.dbcomponent.entity.UserTables">
+        <include refid="Select_UserTablesList"/>
+        where 1=1
+        <if test="tableName != null and tableName != ''">
+            and upper(t.TABLE_NAME) like '%' || upper(#{tableName}) ||  '%'
+        </if>
+        <if test="tableNameLimitList != null and tableNameLimitList.size() > 0">
+            and
+          <foreach collection="tableNameLimitList" item="tableNameLimit" open="(" close=")" separator="and">
+              t.table_name != #{tableNameLimit}
+          </foreach>
+        </if>
+    </select>
+
+    <!--根据表名+查询条件 查询，需要防止 sql 注入-->
+    <select id="selectTableDataByConditions" resultType="map">
+        select *
+        from (select s.*, rownum rn
+          from (
+
+            select
+            <foreach collection="allTableColCommentsListByDelLimit" item="column" open="" close="" separator=",">
+                t.${column.columnName}
+            </foreach>
+          from ${tableName} t
+            where 1=1
+            <include refid="Where_SelectTableDataByConditions"/>
+
+            <if test="field !=null and field !='' and direction !=null and direction !=''" >
+                order by ${field} ${direction}
+            </if>
+
+          ) s where rownum &lt;= #{limit} + #{start})
+        where rn >= #{start} + 1
+    </select>
+
+    <sql id="Where_SelectTableDataByConditions">
+        <if test="colConditionList !=null and colConditionList.size() > 0">
+            and
+            <foreach collection="colConditionList" item="column" open="(" separator="and" close=")">
+                <choose>
+                    <when test="column.startDateVal != null and column.startDateVal != ''">
+                        ${column.columnName} >= to_date(#{column.startDateVal}, 'yyyy/MM/dd hh24:mi:ss')
+                        and ${column.columnName} &lt;= to_date(#{column.endDateVal}, 'yyyy/MM/dd hh24:mi:ss')
+                    </when>
+                    <when test="column.columnVal != null and column.columnVal != ''">
+                        ${column.columnName} like '%' || #{column.columnVal} || '%'
+                    </when>
+                    <otherwise>
+                        1=1
+                    </otherwise>
+                </choose>
+
+            </foreach>
+        </if>
+    </sql>
+
+    <!--查询表格的数量-->
+    <select id="selectTableDataCountByConditions" resultType="int">
+        select count(*) from ${tableName}
+        where 1=1
+        <include refid="Where_SelectTableDataByConditions"/>
+    </select>
+
+</mapper>
