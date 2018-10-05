@@ -15,10 +15,10 @@ public interface UserTablesDao {
     /**
      * 查询表名
      * @param tableName
-     * @param tableNameLimitList
+     * @param canQueryTableNameList
      * @return
      */
-    List<UserTables> selectUserTablesListByTbName(@Param("tableName") String tableName, @Param("tableNameLimitList") List<String> tableNameLimitList);
+    List<UserTables> selectUserTablesListByTbName(@Param("tableName") String tableName, @Param("canQueryTableNameList") List<String> canQueryTableNameList);
 
     /**
      * 根据表名+查询条件 查询数据

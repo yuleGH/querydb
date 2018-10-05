@@ -10,6 +10,13 @@
           LEFT JOIN USER_COL_COMMENTS a ON t.table_name = a.table_NAME AND t.COLUMN_NAME = a.COLUMN_NAME
       WHERE
           upper(t.TABLE_NAME) = upper(#{tableName,jdbcType=VARCHAR})
+
+        <if test="tableColumnLimitList != null and tableColumnLimitList.size() > 0">
+            and
+            <foreach collection="tableColumnLimitList" item="tableColumnLimit" open="(" close=")" separator="and">
+                t.COLUMN_NAME != #{tableColumnLimit}
+            </foreach>
+        </if>
     </sql>
 
     <!--查询某个表下的所有字段-->

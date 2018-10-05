@@ -38,20 +38,12 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
     @Value("${dbComponentDataSources}")
     private String dbComponentDataSources;
 
-    /**
-     * 查询数据源
-     * @return
-     */
     @Override
     public List<String> getDbComponentDataSources(){
         String[] dataSourceArray = dbComponentDataSources.split(",");
         return Arrays.asList(dataSourceArray);
     }
 
-    /**
-     * 查询所有表名，有限制私密
-     * @return
-     */
     @Override
     public List<UserTables> selectUserTablesListByTbName(String tableName, String dataSourceType){
         DataSourceHolder.setDataSourceType(dataSourceType);
@@ -59,10 +51,6 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
         return userTablesList;
     }
 
-    /**
-     * 查询某表的所有列字段，限制私密
-     * @return
-     */
     @Override
     public List<UserColComments> selectUserColCommentsListByTbName(String tableName, String dataSourceType){
         DataSourceHolder.setDataSourceType(dataSourceType);
@@ -70,12 +58,6 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
         return userColCommentsList;
     }
 
-    /**
-     * 根据表名获取表格数据，有限制私密
-     * @param tableName 表名
-     * @param tableConditionsJson 表的查询条件
-     * @return
-     */
     @Override
     public Object getTableData(String tableName, String tableConditionsJson, String dataSourceType,
                                Integer start, Integer limit, String field, String direction){

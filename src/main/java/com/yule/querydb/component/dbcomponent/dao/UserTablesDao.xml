@@ -16,11 +16,16 @@
         <if test="tableName != null and tableName != ''">
             and upper(t.TABLE_NAME) like '%' || upper(#{tableName}) ||  '%'
         </if>
-        <if test="tableNameLimitList != null and tableNameLimitList.size() > 0">
+
+        <if test="canQueryTableNameList != null and canQueryTableNameList.size() > 0">
             and
-          <foreach collection="tableNameLimitList" item="tableNameLimit" open="(" close=")" separator="and">
-              t.table_name != #{tableNameLimit}
+          <foreach collection="canQueryTableNameList" item="tableName" open="(" close=")" separator="or">
+              t.table_name = #{tableName}
           </foreach>
+        </if>
+        <if test="canQueryTableNameList == null or canQueryTableNameList.size() == 0">
+            and
+            1=2
         </if>
     </select>
 

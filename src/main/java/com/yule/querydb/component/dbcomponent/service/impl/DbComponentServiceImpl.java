@@ -12,7 +12,6 @@ import com.yule.querydb.utils.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +31,8 @@ public class DbComponentServiceImpl implements DbComponentService {
 
     @Override
     public List<UserTables> selectUserTablesListByTbName(String tableName) {
-        List<String> tableNameLimitList = DbLimitUtil.getTableNameLimitList();
-        return this.userTablesDao.selectUserTablesListByTbName(tableName, tableNameLimitList);
+        List<String> canQueryTableNameList = DbLimitUtil.getCanQueryTableNameList();
+        return this.userTablesDao.selectUserTablesListByTbName(tableName, canQueryTableNameList);
     }
 
     @Override
@@ -59,7 +58,8 @@ public class DbComponentServiceImpl implements DbComponentService {
             colConditionList = gson.fromJson(tableConditionsJson, new TypeToken<List<UserColComments>>(){}.getType());
 
             //防止 sql 注入，校验列名
-            List<UserColComments> userColCommentsList = this.userColCommentsDao.selectUserColCommentsListByColumns(tableName, colConditionList);
+            List<String> tableColumnLimitList = DbLimitUtil.getForbidTableColumnListByTableName(tableName);
+            List<UserColComments> userColCommentsList = this.userColCommentsDao.selectUserColCommentsListByColumns(tableName, tableColumnLimitList, colConditionList);
             if(userColCommentsList.size() != colConditionList.size()){
                 logger.error("查询条件列名有问题！");
                 return new ArrayList<>(0);
@@ -79,21 +79,9 @@ public class DbComponentServiceImpl implements DbComponentService {
      * @return
      */
     private List<UserColComments> getAllTableColCommentsListByDelLimit(String tableName) {
-        List<UserColComments> allTableColCommentsListByDelLimit = new ArrayList<>();
-
-        List<String> tableColumnLimitList = DbLimitUtil.getTableColumnLimitListByTableName(tableName);
-        List<UserColComments> allTableColCommentsList = this.userColCommentsDao.selectUserColCommentsListByTbName(tableName);
-        if(CommonUtil.isNullOrBlock(tableColumnLimitList)){
-            return allTableColCommentsList;
-        }
-
-        for(UserColComments userColComments : allTableColCommentsList){
-            if(!tableColumnLimitList.contains(userColComments.getColumnName())){
-                allTableColCommentsListByDelLimit.add(userColComments);
-            }
-        }
-
-        return allTableColCommentsListByDelLimit;
+        List<String> tableColumnLimitList = DbLimitUtil.getForbidTableColumnListByTableName(tableName);
+        List<UserColComments> allTableColCommentsList = this.userColCommentsDao.selectUserColCommentsListByTbName(tableName, tableColumnLimitList);
+        return allTableColCommentsList;
     }
 
     @Override

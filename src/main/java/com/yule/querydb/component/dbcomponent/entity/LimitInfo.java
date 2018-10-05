@@ -8,22 +8,29 @@ import java.util.List;
  * @date 2018/9/28 17:43
  */
 public class LimitInfo {
-    private String tableName;
-    private List<String> tableColumns;
+    /**
+     * 可以查询的表名数组
+     */
+    private List<String> canQueryTables;
 
-    public String getTableName() {
-        return tableName;
+    /**
+     * 禁止查询的字段对象
+     */
+    private List<LimitColumnInfo> forbidQueryColumns;
+
+    public List<String> getCanQueryTables() {
+        return canQueryTables;
     }
 
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+    public void setCanQueryTables(List<String> canQueryTables) {
+        this.canQueryTables = canQueryTables;
     }
 
-    public List<String> getTableColumns() {
-        return tableColumns;
+    public List<LimitColumnInfo> getForbidQueryColumns() {
+        return forbidQueryColumns;
     }
 
-    public void setTableColumns(List<String> tableColumns) {
-        this.tableColumns = tableColumns;
+    public void setForbidQueryColumns(List<LimitColumnInfo> forbidQueryColumns) {
+        this.forbidQueryColumns = forbidQueryColumns;
     }
 }

@@ -1,5 +1,0 @@
-//默认配置
-{
-  "canQueryTables": [],
-  "forbidQueryColumns": []
-}
