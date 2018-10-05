@@ -1,6 +1,5 @@
 package com.yule.querydb.component.dbcomponent.service;
 
-import com.yule.querydb.annotation.MyParam;
 import com.yule.querydb.component.dbcomponent.entity.UserColComments;
 import com.yule.querydb.component.dbcomponent.entity.UserTables;
 
