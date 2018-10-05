@@ -41,9 +41,9 @@ var commonFun = {
                 }
                 obj.$vue && loading.close();
             },
-            failAlertCallback: function (data) {
+            error: function () {
                 if (obj.backFailFunction) {
-                    obj.backFailFunction(data);
+                    obj.backFailFunction();
                 }
                 obj.$vue && loading.close();
             }

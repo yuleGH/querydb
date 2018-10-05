@@ -69,8 +69,15 @@ public class QueryDbDispatcherServlet extends HttpServlet {
         response.setCharacterEncoding("utf-8");
 
         if (path.endsWith(".json")){
-            //处理ajax请求
-            dealJsonService(request, response, path);
+            try{
+                //处理ajax请求
+                dealJsonService(request, response, path);
+            } catch (Exception e){
+                logger.error("访问querydb ajax报错！", e);
+                response.setStatus(500);
+//                response.getWriter().write(ExceptionUtil.getStackTrace(e));
+                response.getWriter().write("服务器端未知错误");
+            }
         }else {
             //返回文件流  包含这种".html"
             responseFile(response, path);
@@ -137,7 +144,8 @@ public class QueryDbDispatcherServlet extends HttpServlet {
         }
 
         if(!flag){
-            return404Page(response, path);
+            logger.error("404-找不到地址：{}", path);
+            response.setStatus(404);
         }
     }
 
