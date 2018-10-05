@@ -122,7 +122,6 @@ public class QueryDbDispatcherServlet extends HttpServlet {
     private void dealJsonService(HttpServletRequest request, HttpServletResponse response, String path) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         String methodName = path.substring(1, path.indexOf(".json"));
 
-
         final Method[] methods = DbComponentTopService.class.getMethods();
         boolean flag = false;
         for(Method method : methods){
