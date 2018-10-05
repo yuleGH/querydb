@@ -88,6 +88,7 @@
     <el-row :gutter="20" class="m-b20">
         <el-col>
             <el-button type="primary" @click="handleQueryTableDataByCondition">根据条件查询数据</el-button>
+            <el-button type="primary" @click="handleExportTableDataByCondition">根据条件导出</el-button>
         </el-col>
     </el-row>
 
@@ -136,7 +137,8 @@
         getTableDataUrl: "getTableData.json",
         getDbComponentDataSourcesUrl: "getDbComponentDataSources.json",
         selectUserTablesListByTbNameUr: "selectUserTablesListByTbName.json",
-        selectUserColCommentsListByTbNameUrl: "selectUserColCommentsListByTbName.json"
+        selectUserColCommentsListByTbNameUrl: "selectUserColCommentsListByTbName.json",
+        exportExcelUrl: "exportExcelTableData.json"
     }
 </script>
 
@@ -280,7 +282,20 @@
              * 根据查询条件获取表格数据
              */
             handleQueryTableDataByCondition() {
+                if(!this.tableName){
+                    return;
+                }
+
+                this.$refs.tableRef.reload(this.buildQueryParams());
+            },
+            /**
+             * 构造查询参数
+             */
+            buildQueryParams(){
+                const tableName = this.tableName;
+                const dataSourceType = this.dataSourceSelect;
                 const tableConditions = this.tableConditions;
+
                 const _self = this;
                 tableConditions.forEach(function(x, i){
                     if(_self.judgeIsDateType(x)){
@@ -293,20 +308,13 @@
                         x.endDateVal = null;
                     }
                 });
-                this.commonGetTableData(tableConditions);
-            },
-            commonGetTableData(tableConditions) {
-                const tableName = this.tableName;
-                if(!tableName){
-                    return;
-                }
 
-                const dataSourceType = this.dataSourceSelect;
-                this.$refs.tableRef.reload({
+                let params = {
                     tableName: tableName,
                     dataSourceType: dataSourceType,
                     tableConditionsJson: tableConditions && JSON.stringify(tableConditions)
-                });
+                };
+                return params;
             },
 
             /**
@@ -316,6 +324,35 @@
              */
             judgeIsDateType(item){
                 return item.dataType.indexOf('TIMESTAMP') >= 0 || item.dataType.indexOf('DATE') >= 0;
+            },
+
+            /**
+             * 根据查询条件导出表格数据
+             */
+            handleExportTableDataByCondition(){
+                if(!this.tableName){
+                    return;
+                }
+
+                this.$confirm('导出请慎重, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$message({
+                        type: 'success',
+                        message: '正在导出，请稍等!'
+                    });
+                    let params = this.buildQueryParams();
+                    params.field = this.$refs.tableRef.field;
+                    params.direction = this.$refs.tableRef.direction;
+                    commonFun.openPostWindow(urls.exportExcelUrl, params, "_blank");
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消导出'
+                    });
+                });
             }
         }
     });

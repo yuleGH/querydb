@@ -5,13 +5,16 @@ import com.yule.querydb.component.dbcomponent.entity.UserTables;
 import com.yule.querydb.component.dbcomponent.service.DbComponentService;
 import com.yule.querydb.component.dbcomponent.service.DbComponentTopService;
 import com.yule.querydb.datasource.DataSourceHolder;
+import com.yule.querydb.utils.CommonUtil;
+import com.yule.querydb.utils.excel.ExportExcelUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * 数据库单表查询组件
@@ -31,6 +34,8 @@ import java.util.Map;
  * @date 2018/9/22 15:57
  */
 public class DbComponentTopServiceImpl implements DbComponentTopService {
+
+    private final Logger logger = LoggerFactory.getLogger(DbComponentTopServiceImpl.class);
 
     @Autowired
     private DbComponentService dbComponentService;
@@ -63,12 +68,7 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
                                Integer start, Integer limit, String field, String direction){
         DataSourceHolder.setDataSourceType(dataSourceType);
 
-        Map<String, Object> pageConfMap = new HashMap<>(16);
-        pageConfMap.put("start", start == null ? 0 : start);
-        pageConfMap.put("limit", limit == null ? 0 : limit);
-        pageConfMap.put("field", field);
-        pageConfMap.put("direction", direction);
-        List<Map<String, String>> tableData = this.dbComponentService.getTableData(tableName, tableConditionsJson, pageConfMap);
+        List<Map<String, String>> tableData = getTableDataList(start, limit, field, direction, tableName, tableConditionsJson);
         int totalCount = 0;
         if(tableData.size() > 0){
             totalCount = this.dbComponentService.getTableDataCount(tableName, tableConditionsJson);
@@ -79,4 +79,51 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
         result.put("total", totalCount);
         return result;
     }
+
+    @Override
+    public void exportExcelTableData(HttpServletRequest request, HttpServletResponse response,
+                                     String tableName, String tableConditionsJson, String dataSourceType,
+                                     String field, String direction) {
+        DataSourceHolder.setDataSourceType(dataSourceType);
+
+        List<String> headerList = new ArrayList<>();
+        List<String> fieldList = new ArrayList<>();
+
+        List<UserColComments> userColCommentsList = this.dbComponentService.selectUserColCommentsListByTbName(tableName);
+        if(CommonUtil.isNotNullOrBlock(userColCommentsList)){
+            for(UserColComments userColComments : userColCommentsList){
+                headerList.add(userColComments.getColumnName() + "：" + userColComments.getComments());
+                fieldList.add(userColComments.getColumnName());
+            }
+        }
+
+        List<Map<String, String>> tableData = getTableDataList(0, Integer.MAX_VALUE, field, direction, tableName, tableConditionsJson);
+
+        try {
+            ExportExcelUtil.exportExcel(request, response, tableName, headerList, fieldList, tableData);
+        } catch (Exception e) {
+            logger.error("导出报错！", e);
+        }
+    }
+
+    /**
+     * 只获取表格数据
+     * @param start
+     * @param limit
+     * @param field
+     * @param direction
+     * @param tableName
+     * @param tableConditionsJson
+     * @return
+     */
+    private List<Map<String, String>> getTableDataList(Integer start, Integer limit, String field, String direction, String tableName, String tableConditionsJson) {
+        Map<String, Object> pageConfMap = new HashMap<>(16);
+        pageConfMap.put("start", start == null ? 0 : start);
+        pageConfMap.put("limit", limit == null ? 0 : limit);
+        pageConfMap.put("field", field);
+        pageConfMap.put("direction", direction);
+        List<Map<String, String>> tableData = this.dbComponentService.getTableData(tableName, tableConditionsJson, pageConfMap);
+        return tableData;
+    }
+
 }

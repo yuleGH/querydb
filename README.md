@@ -3,6 +3,8 @@
 
 实现：maven + servlet + spring + mybatis
 
+需要放心的是，没有 sql 注入！！！
+
 ### 实现的功能
 1. 代码 down 下来，可以打包为 jar 包供其他项目使用。
 <br> 配置好后，访问地址为 /querydb/index.html

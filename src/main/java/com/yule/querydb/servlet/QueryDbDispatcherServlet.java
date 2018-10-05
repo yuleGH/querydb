@@ -127,9 +127,11 @@ public class QueryDbDispatcherServlet extends HttpServlet {
         for(Method method : methods){
             if(method.getName().equals(methodName)){
                 flag = true;
-                Object objResult = getObjResultByMethod(request, method);
-                Gson gson = new Gson();
-                response.getWriter().print(gson.toJson(objResult));
+                Object objResult = getObjResultByMethod(request, response, method);
+                if(objResult != null){
+                    Gson gson = new Gson();
+                    response.getWriter().print(gson.toJson(objResult));
+                }
                 break;
             }
         }
@@ -142,14 +144,15 @@ public class QueryDbDispatcherServlet extends HttpServlet {
     /**
      * 执行方法，获取结果值
      * @param request
+     * @param response
      * @param method
      * @return
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      * @throws NoSuchMethodException
      */
-    private Object getObjResultByMethod(HttpServletRequest request, Method method) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        Object objResult;
+    private Object getObjResultByMethod(HttpServletRequest request, HttpServletResponse response, Method method) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        Object objResult = null;
 
         String methodName = method.getName();
         DbComponentTopService dbComponentTopService = SpringContextHolder.getBean(DbComponentTopService.class);
@@ -171,7 +174,11 @@ public class QueryDbDispatcherServlet extends HttpServlet {
                         MyParam customAnnotation = (MyParam) annotation;
                         Class curParameterType = parameterTypes[i];
 
-                        if(curParameterType.getName().equals("java.lang.Integer")){
+                        if("httpServletRequest".equals(customAnnotation.value())){
+                            parameterValues[i++] = request;
+                        }else if ("httpServletResponse".equals(customAnnotation.value())){
+                            parameterValues[i++] = response;
+                        }else if ("java.lang.Integer".equals(curParameterType.getName())){
                             parameterValues[i++] = Integer.parseInt(request.getParameter(customAnnotation.value()));
                         }else{
                             parameterValues[i++] = request.getParameter(customAnnotation.value());

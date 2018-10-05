@@ -29,7 +29,7 @@
         </if>
     </select>
 
-    <!--根据表名+查询条件 查询，需要防止 sql 注入-->
+    <!--根据表名+查询条件 查询，需要防止 sql 注入      indexOf('TIMESTAMP') == 0 以什么开头-->
     <select id="selectTableDataByConditions" resultType="map">
         select *
         from (select s.*, rownum rn
@@ -37,7 +37,14 @@
 
             select
             <foreach collection="allTableColCommentsListByDelLimit" item="column" open="" close="" separator=",">
-                t.${column.columnName}
+                <choose>
+                    <when test="column.dataType == 'DATA' or column.dataType.indexOf('TIMESTAMP') == 0 ">
+                        to_char(t.${column.columnName}, 'yyyy-MM-dd hh24:mi:ss') ${column.columnName}
+                    </when>
+                    <otherwise>
+                        t.${column.columnName}
+                    </otherwise>
+                </choose>
             </foreach>
           from ${tableName} t
             where 1=1
