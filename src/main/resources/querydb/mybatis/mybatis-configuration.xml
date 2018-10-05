@@ -8,7 +8,7 @@
     </settings>
 
     <typeHandlers>
-        <!--自定义处理-->
+        <!--自定义处理 JdbcType.TIMESTAMP 和 java Object-->
         <typeHandler handler="com.yule.querydb.typehandler.MyObjectTypeHandle"/>
     </typeHandlers>
 </configuration>

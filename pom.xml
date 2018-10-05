@@ -173,6 +173,7 @@
                     <include>**/*.html</include>
                     <include>**/*.js</include>
                     <include>**/*.css</include>
+                    <include>**/*.jpg</include>
                     <include>**/*.xml</include>
                 </includes>
                 <excludes>

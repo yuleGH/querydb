@@ -19,11 +19,10 @@ public class PropertiesUtils {
 
     public static Properties pro = new Properties();
 
-    private static final String defaultPath = "config/querydb.properties" ;
-
     public static void init(String path){
-        if(CommonUtil.isEmpty(path)){
-            path = defaultPath;
+        if (CommonUtil.isEmpty(path)) {
+            logger.error("配置文件为空，初始化失败！");
+            return;
         }
         InputStream in = PropertiesUtils.class.getResourceAsStream(path);
 
@@ -72,7 +71,6 @@ public class PropertiesUtils {
             String jsonStr = sb.toString();
             return jsonStr;
         } catch (IOException e) {
-            e.printStackTrace();
             logger.error("读取文件报错", e);
         } finally {
             if(fileReader != null){

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+  <display-name>springmvc-mybatis-test</display-name>
+
+  <!--还需要在 web.xml 配置读取所有相关的 spring 配置文件-->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath*:querydb/example/spring-mybatis-querydb.xml</param-value>
+  </context-param>
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>querydb</servlet-name>
+    <servlet-class>com.yule.querydb.servlet.QueryDbDispatcherServlet</servlet-class>
+    <init-param>
+      <!--设置配置-->
+      <param-name>propertiesPath</param-name>
+      <param-value>/querydb/example/querydb.properties</param-value>
+    </init-param>
+    <!--启动加载的顺序-->
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>querydb</servlet-name>
+    <!--“/”: 会拦截所有请求，包括js、jsp、html等-->
+    <url-pattern>/querydb/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>

@@ -1,4 +1,4 @@
-package com.yule.querydb.component.dbcomponent.entity;
+package com.yule.querydb.commonenum;
 
 import java.util.ArrayList;
 import java.util.Arrays;

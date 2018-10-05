@@ -1,13 +1,9 @@
 package com.yule.querydb.servlet;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.yule.querydb.annotation.MyParam;
 import com.yule.querydb.component.dbcomponent.service.DbComponentTopService;
-import com.yule.querydb.utils.CommonUtil;
-import com.yule.querydb.utils.PropertiesUtils;
-import com.yule.querydb.utils.ResourceUtil;
-import com.yule.querydb.utils.SpringContextHolder;
+import com.yule.querydb.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +16,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author yule
@@ -29,31 +23,12 @@ import java.util.Map;
  */
 public class QueryDbDispatcherServlet extends HttpServlet {
 
-    private final String INDEX_URL = "/index.html";
-
     /**
-     * 资源文件的路径
+     * 资源文件的主路径
      */
-    private final String RESOURCE_PATH = "querydb/front";
-
-    private static final Map<String, String> CONTENT_TYPE_MAP = new HashMap<String, String>(){};
+    private final String RESOURCE_PATH = "querydb/page";
 
     private final Logger logger = LoggerFactory.getLogger(QueryDbDispatcherServlet.class);
-
-    static {
-        CONTENT_TYPE_MAP.put(".html", "text/html; charset=utf-8");
-        CONTENT_TYPE_MAP.put(".css", "text/css;charset=utf-8");
-        CONTENT_TYPE_MAP.put(".js", "text/javascript;charset=utf-8");
-        CONTENT_TYPE_MAP.put(".json", "application/json");
-
-        //字体
-        CONTENT_TYPE_MAP.put(".ttf", "application/x-font-ttf");
-        CONTENT_TYPE_MAP.put(".woff", "application/x-font-woff");
-
-        //图片
-        CONTENT_TYPE_MAP.put(".jpg", "image/jpeg");
-        CONTENT_TYPE_MAP.put(".png", "image/png");
-    }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -61,12 +36,17 @@ public class QueryDbDispatcherServlet extends HttpServlet {
         super.init(config);
     }
 
-    protected String getFilePath(String fileName) {
-        return RESOURCE_PATH + fileName;
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try{
+            doService(request, response);
+        } catch (Exception e){
+            logger.error("访问querydb报错！", e);
+            returnErrorPage(response);
+        }
     }
 
-    @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void doService(HttpServletRequest request, HttpServletResponse response) throws IOException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         String contextPath = request.getContextPath();
         String servletPath = request.getServletPath();
         String requestURI = request.getRequestURI();
@@ -83,68 +63,129 @@ public class QueryDbDispatcherServlet extends HttpServlet {
         if(CommonUtil.isEmpty(path)){
             return;
         }
-        if(!path.contains(".")){
-            return;
-        }
 
         setResponseContentType(response, path);
 
-        if (path.endsWith(".html")) {
-            //返回主页面
-            response.setCharacterEncoding("utf-8");
-            dealHtmlService(response, path);
-        }else if(path.endsWith(".json")){
-            response.setCharacterEncoding("utf-8");
-            try {
-                dealJsonService(request, response, path);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        response.setCharacterEncoding("utf-8");
+
+        if (path.endsWith(".json")){
+            //处理ajax请求
+            dealJsonService(request, response, path);
         }else {
+            //返回文件流  包含这种".html"
             responseFile(response, path);
         }
     }
 
+    /**
+     * 返回错误页面
+     * @param response
+     * @throws IOException
+     */
+    private void returnErrorPage(HttpServletResponse response) throws IOException {
+        //不走后台了，以免循环重定向
+        response.sendRedirect("/front/page/error.html");
+    }
+
+    /**
+     * 返回404页面
+     * @param response
+     * @param path
+     * @throws IOException
+     */
+    private void return404Page(HttpServletResponse response, String path) throws IOException {
+        logger.error("404-找不到地址：{}", path);
+        //不走后台了，以免循环重定向
+        response.sendRedirect("/front/page/404.html");
+    }
+
+    /**
+     * 返回文件路径
+     * @param fileName
+     * @return
+     */
+    private String getFilePath(String fileName) {
+        return RESOURCE_PATH + fileName;
+    }
+
+    /**
+     * 处理ajax的json请求
+     * @param request
+     * @param response
+     * @param path
+     * @throws IOException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
     private void dealJsonService(HttpServletRequest request, HttpServletResponse response, String path) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         String methodName = path.substring(1, path.indexOf(".json"));
 
-        DbComponentTopService dbComponentTopService = SpringContextHolder.getBean(DbComponentTopService.class);
+
         final Method[] methods = DbComponentTopService.class.getMethods();
+        boolean flag = false;
         for(Method method : methods){
             if(method.getName().equals(methodName)){
-                Object objResult;
-
-                final Class<?>[] parameterTypes = method.getParameterTypes();
-                Object[] parameterValues = new Object[parameterTypes.length];
-                int i = 0;
-
-                if(CommonUtil.isNullOrBlock(parameterTypes)){
-                    Method myMethod = DbComponentTopService.class.getMethod(methodName);
-                    objResult = myMethod.invoke(dbComponentTopService);
-                }else{
-                    final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-                    for (Annotation[] annotation1 : parameterAnnotations) {
-                        for (Annotation annotation : annotation1) {
-                            if (annotation instanceof MyParam) {
-                                MyParam customAnnotation = (MyParam) annotation;
-                                Class curParameterType = parameterTypes[i];
-
-                                if(curParameterType.getName().equals("java.lang.Integer")){
-                                    parameterValues[i++] = Integer.parseInt(request.getParameter(customAnnotation.value()));
-                                }else{
-                                    parameterValues[i++] = request.getParameter(customAnnotation.value());
-                                }
-                            }
-                        }
-                    }
-
-                    Method myMethod = DbComponentTopService.class.getMethod(methodName, parameterTypes);
-                    objResult = myMethod.invoke(dbComponentTopService, parameterValues);
-                }
+                flag = true;
+                Object objResult = getObjResultByMethod(request, method);
                 Gson gson = new Gson();
                 response.getWriter().print(gson.toJson(objResult));
+                break;
             }
         }
+
+        if(!flag){
+            return404Page(response, path);
+        }
+    }
+
+    /**
+     * 执行方法，获取结果值
+     * @param request
+     * @param method
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     */
+    private Object getObjResultByMethod(HttpServletRequest request, Method method) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        Object objResult;
+
+        String methodName = method.getName();
+        DbComponentTopService dbComponentTopService = SpringContextHolder.getBean(DbComponentTopService.class);
+        //方法的参数类型
+        final Class<?>[] parameterTypes = method.getParameterTypes();
+        //存放方法的参数值
+        final Object[] parameterValues = new Object[parameterTypes.length];
+        int i = 0;
+
+        if(CommonUtil.isNullOrBlock(parameterTypes)){
+            Method myMethod = DbComponentTopService.class.getMethod(methodName);
+            objResult = myMethod.invoke(dbComponentTopService);
+        }else{
+            //获取方法的参数注解
+            final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+            for (Annotation[] annotation1 : parameterAnnotations) {
+                for (Annotation annotation : annotation1) {
+                    if (annotation instanceof MyParam) {
+                        MyParam customAnnotation = (MyParam) annotation;
+                        Class curParameterType = parameterTypes[i];
+
+                        if(curParameterType.getName().equals("java.lang.Integer")){
+                            parameterValues[i++] = Integer.parseInt(request.getParameter(customAnnotation.value()));
+                        }else{
+                            parameterValues[i++] = request.getParameter(customAnnotation.value());
+                        }
+                    }
+                }
+            }
+
+            Method myMethod = DbComponentTopService.class.getMethod(methodName, parameterTypes);
+            objResult = myMethod.invoke(dbComponentTopService, parameterValues);
+        }
+
+        return objResult;
     }
 
     /**
@@ -153,24 +194,11 @@ public class QueryDbDispatcherServlet extends HttpServlet {
      * @param path
      */
     private void setResponseContentType(HttpServletResponse response, String path) {
-        String suffix = path.substring(path.lastIndexOf("."));
-        if(CommonUtil.isNotEmpth(suffix) && CONTENT_TYPE_MAP.containsKey(suffix)){
-            response.setContentType(CONTENT_TYPE_MAP.get(suffix));
-        } else {
-            response.setContentType("application/octet-stream");
-        }
-    }
-
-    /**
-     * 处理html的service，直接返回 index.html
-     * @param response
-     * @param path
-     * @throws IOException
-     */
-    private void dealHtmlService(HttpServletResponse response, String path) throws IOException {
-        //只支持 index.html
-        if(INDEX_URL.equals(path)){
-            responseFile(response, path);
+        if(!path.contains(".")){
+            response.setContentType(ContentTypeUtil.getDefaultValue());
+        }else{
+            String suffix = path.substring(path.lastIndexOf("."));
+            response.setContentType(ContentTypeUtil.getValueByKey(suffix));
         }
     }
 
@@ -183,6 +211,10 @@ public class QueryDbDispatcherServlet extends HttpServlet {
     private void responseFile(HttpServletResponse response, String path) throws IOException {
         String filePath = getFilePath(path);
         String text = ResourceUtil.readFromResource(filePath);
+        if(CommonUtil.isEmpty(text)){
+            return404Page(response, path);
+            return;
+        }
         response.getWriter().write(text);
     }
 }
