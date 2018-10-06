@@ -12,5 +12,6 @@
 <br>（配置文件参考：resources/querydb/example/limit.json）
 3. 支持多数据源。
 <br>（配置文件参考：resources/querydb/example/db.properties，resources/querydb/example/spring-mybatis-querydb.xml）
-4. 页面支持导出功能
-5. 
+4. 页面支持导出功能。
+5. 页面支持查询条件动态组装。
+6. 现支持 oracle 数据库。

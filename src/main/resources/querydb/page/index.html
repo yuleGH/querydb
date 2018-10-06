@@ -53,38 +53,15 @@
 
         <el-col :span="4">
             <el-button type="primary" @click="handleSelectTable">查询列字段</el-button>
+            <el-button type="primary" @click="handleAddCustomCondition">添加自定义查询条件</el-button>
         </el-col>
     </el-row>
 
     <!--查询条件-->
-    <el-row :gutter="20" class="m-b20">
-        <div
-                v-for="(item,index) in tableConditions"
-                :key="item.columnName"
-        >
-            <template v-if="judgeIsDateType(item)">
-                <el-col :span="8" class="m-t20">
-                    <el-date-picker
-                            v-model="item.dateValArray"
-                            type="datetimerange"
-                            :editable="false"
-                            format="yyyy-MM-dd HH:mm:ss"
-                            value-format="yyyy-MM-dd HH:mm:ss"
-                            clearable
-                            range-separator="至"
-                            :start-placeholder="item.columnName"
-                            :end-placeholder="item.columnName">
-                    </el-date-picker>
-                </el-col>
-            </template>
-            <template v-else>
-                <el-col :span="4" class="m-t20">
-                    <el-input v-model="item.columnVal" :placeholder="item.columnName"
-                              @keyup.enter.native="handleQueryTableDataByCondition"></el-input>
-                </el-col>
-            </template>
-        </div>
-    </el-row>
+    <table-conditions-component :table-conditions.sync="tableConditions"
+                                :judge-is-date-type="judgeIsDateType"
+                                :handle-query-table-data-by-condition="handleQueryTableDataByCondition"></table-conditions-component>
+
     <el-row :gutter="20" class="m-b20">
         <el-col>
             <el-button type="primary" @click="handleQueryTableDataByCondition">根据条件查询数据</el-button>
@@ -96,6 +73,15 @@
     <table-component ref="tableRef" :table-columns="tableColumns"></table-component>
 </div>
 
+<!-- 引入组件库 -->
+<script type="text/javascript" src="/front/js/lib/jquery.js"></script>
+<script type="text/javascript" src="/front/js/lib/vue.js"></script>
+<script type="text/javascript" src="/front/js/lib/elementui.js"></script>
+<script type="text/javascript" src="/front/js/common/common.js"></script>
+<script type="text/javascript" src="/front/js/common/paginationTool.js"></script>
+
+
+<!--表格组件，需要分页-->
 <div id="tableApp">
     <div>
         <el-table
@@ -124,25 +110,6 @@
         </el-pagination>
     </div>
 </div>
-
-<!-- 引入组件库 -->
-<script type="text/javascript" src="/front/js/lib/jquery.js"></script>
-<script type="text/javascript" src="/front/js/lib/vue.js"></script>
-<script type="text/javascript" src="/front/js/lib/elementui.js"></script>
-<script type="text/javascript" src="/front/js/common/common.js"></script>
-<script type="text/javascript" src="/front/js/common/paginationTool.js"></script>
-
-<script type="text/javascript">
-    const urls = {
-        getTableDataUrl: "getTableData.json",
-        getDbComponentDataSourcesUrl: "getDbComponentDataSources.json",
-        selectUserTablesListByTbNameUr: "selectUserTablesListByTbName.json",
-        selectUserColCommentsListByTbNameUrl: "selectUserColCommentsListByTbName.json",
-        exportExcelUrl: "exportExcelTableData.json"
-    }
-</script>
-
-<!--表格组件，需要分页-->
 <script type="text/javascript">
     const tableComponent = {
         template: document.getElementById("tableApp").innerHTML,
@@ -172,190 +139,276 @@
     };
 </script>
 
+<!--查询条件组件-->
+<div id="tableConditionsApp">
+    <el-row :gutter="20" class="m-b20">
+        <div
+                v-for="(item,index) in tableConditions"
+                :key="item.columnName"
+        >
+            <template v-if="judgeIsDateType(item)">
+                <el-col :span="8" class="m-t20">
+                    <el-date-picker
+                            v-model="item.dateValArray"
+                            type="datetimerange"
+                            :editable="false"
+                            format="yyyy-MM-dd HH:mm:ss"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            clearable
+                            range-separator="至"
+                            :start-placeholder="item.columnName"
+                            :end-placeholder="item.columnName">
+                    </el-date-picker>
+                </el-col>
+            </template>
+            <template v-else>
+                <el-col :span="4" class="m-t20">
+                    <el-input v-model="item.columnVal" :placeholder="item.columnName"
+                              @keyup.enter.native="handleQueryTableDataByCondition"></el-input>
+                </el-col>
+            </template>
+        </div>
+    </el-row>
+</div>
 <script type="text/javascript">
-    new Vue({
-        el: "#app",
-        data: {
-            tableNameOptions: [], //表下拉框
-            tableNameSelect: '', //表下拉框选中数据
-
-            dataSourceOptions: [],//数据源下拉框
-            dataSourceSelect: '',//数据源下拉框选中的数据
-
-            tableName: '', //当前查询的表名
-
-            tableColumns: [], //表格列名
-            tableConditions: [] //表格查询条件
+    const tableConditionsComponent = {
+        template: document.getElementById("tableConditionsApp").innerHTML,
+        data: function () {
+            return {
+                curTableConditions: []
+            }
         },
-        mounted() {
-            const _self = this;
-            this.$nextTick(() => {
-                commonFun.ajaxSubmit({
-                    url: urls.getDbComponentDataSourcesUrl,
-                    datas: {},
-                    backFunction: function (dataSourceList) {
-                        _self.dataSourceOptions = dataSourceList;
-                }
-            });
-
-        });
+        props: {
+            //表格查询条件
+            tableConditions: {
+                type: Array,
+                required: true
+            },
+            //判断是否是日期类型
+            judgeIsDateType : {
+                type: Function,
+                required: true
+            },
+            //表格查询方法
+            handleQueryTableDataByCondition: {
+                type: Function,
+                required: true
+            }
         },
-        components: {
-            'table-component': tableComponent
+        watch: {
+            tableConditions : function(newVal, oldVal){
+                this.curTableConditions = newVal;
+            },
+            curTableConditions : function(newVal, oldVal){
+                this.$emit("update:tableConditions", newVal);
+            }
         },
         methods: {
-            /**
-             * 处理选择数据源触发
-             */
-            handleDataSourceSelectChange(dataSourceSelect) {
-                if(!dataSourceSelect) return;
 
-                const _self = this;
-                commonFun.ajaxSubmit({
-                    url: urls.selectUserTablesListByTbNameUr,
-                    datas: {dataSourceType: dataSourceSelect},
-                    backFunction: function (tableNameList) {
-                        _self.tableNameSelect = "";
-                        _self.tableColumns = [];
-                        _self.tableConditions = [];
-                        _self.tableNameOptions = tableNameList;
-                    }
-                });
-            },
-            /**
-             * 选择表名
-             */
-            handleSelectTable() {
-                const _self = this;
-                const dataSourceType = this.dataSourceSelect;
-                this.tableName = this.tableNameSelect;
-
-                commonFun.ajaxSubmit({
-                    url: urls.selectUserColCommentsListByTbNameUrl,
-                    datas: {
-                        tableName: _self.tableName,
-                        dataSourceType: dataSourceType
-                    },
-                    backFunction: function (tableColList) {
-                        _self.drawTable(tableColList);
-                        _self.drawTableConditions(tableColList);
-                    }
-                });
-            },
-            /**
-             * 画表格
-             * @param tableColList
-             */
-            drawTable(tableColList) {
-                const _self = this;
-                _self.tableColumns = [];
-                for (let i = 0; i < tableColList.length; i++) {
-                    let item = tableColList[i];
-                    _self.tableColumns.push({
-                        //{tableName: "T_USER", columnName: "ID", comments: "主键"}
-                        id: item.columnName,
-                        prop: item.columnName,
-                        label: item.columnName + "：" + item.comments
-                    });
-                    _self.$refs.tableRef.clearTable();
-                }
-            },
-            /**
-             * 画表格的查询条件
-             * @param tableColList
-             */
-            drawTableConditions(tableColList) {
-                const _self = this;
-                _self.tableConditions = [];
-                for (let i = 0; i < tableColList.length; i++) {
-                    let item = tableColList[i];
-                    _self.tableConditions.push({
-                        //{tableName: "T_USER", columnName: "ID", comments: "主键"}
-                        columnName: item.columnName,
-                        dataType: item.dataType,
-                        columnVal: "",
-                        dateValArray: []
-                    });
-                }
-            },
-            /**
-             * 根据查询条件获取表格数据
-             */
-            handleQueryTableDataByCondition() {
-                if(!this.tableName){
-                    return;
-                }
-
-                this.$refs.tableRef.reload(this.buildQueryParams());
-            },
-            /**
-             * 构造查询参数
-             */
-            buildQueryParams(){
-                const tableName = this.tableName;
-                const dataSourceType = this.dataSourceSelect;
-                const tableConditions = this.tableConditions;
-
-                const _self = this;
-                tableConditions.forEach(function(x, i){
-                    if(_self.judgeIsDateType(x)){
-                        x.columnVal = null;
-                        x.startDateVal = (x.dateValArray && x.dateValArray.length > 0) ? x.dateValArray[0] : null;
-                        x.endDateVal = (x.dateValArray && x.dateValArray.length > 0) ? x.dateValArray[1] : null;
-                    }else{
-                        x.dateValArray = null;
-                        x.startDateVal = null;
-                        x.endDateVal = null;
-                    }
-                });
-
-                let params = {
-                    tableName: tableName,
-                    dataSourceType: dataSourceType,
-                    tableConditionsJson: tableConditions && JSON.stringify(tableConditions)
-                };
-                return params;
-            },
-
-            /**
-             * 判断字段是否为日期类型
-             * @param item
-             * @returns {boolean}
-             */
-            judgeIsDateType(item){
-                return item.dataType.indexOf('TIMESTAMP') >= 0 || item.dataType.indexOf('DATE') >= 0;
-            },
-
-            /**
-             * 根据查询条件导出表格数据
-             */
-            handleExportTableDataByCondition(){
-                if(!this.tableName){
-                    return;
-                }
-
-                this.$confirm('导出请慎重, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    this.$message({
-                        type: 'success',
-                        message: '正在导出，请稍等!'
-                    });
-                    let params = this.buildQueryParams();
-                    params.field = this.$refs.tableRef.field;
-                    params.direction = this.$refs.tableRef.direction;
-                    commonFun.openPostWindow(urls.exportExcelUrl, params, "_blank");
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消导出'
-                    });
-                });
-            }
         }
-    });
+    };
+</script>
+
+<script type="text/javascript">
+    const urls = {
+        getTableDataUrl: "getTableData.json",
+        getDbComponentDataSourcesUrl: "getDbComponentDataSources.json",
+        selectUserTablesListByTbNameUr: "selectUserTablesListByTbName.json",
+        selectUserColCommentsListByTbNameUrl: "selectUserColCommentsListByTbName.json",
+        exportExcelUrl: "exportExcelTableData.json"
+    }
+</script>
+<script type="text/javascript">
+    new Vue({
+            el: "#app",
+            data: {
+                tableNameOptions: [], //表下拉框
+                tableNameSelect: '', //表下拉框选中数据
+
+                dataSourceOptions: [],//数据源下拉框
+                dataSourceSelect: '',//数据源下拉框选中的数据
+
+                tableName: '', //当前查询的表名
+
+                tableColumns: [], //表格列名
+                tableConditions: [] //表格查询条件
+            },
+            mounted() {
+                const _self = this;
+                this.$nextTick(() => {
+                    commonFun.ajaxSubmit({
+                        url: urls.getDbComponentDataSourcesUrl,
+                        datas: {},
+                        backFunction: function (dataSourceList) {
+                            _self.dataSourceOptions = dataSourceList;
+                        }
+                    });
+                });
+            },
+            components: {
+                'table-component': tableComponent,
+                'table-conditions-component': tableConditionsComponent
+            },
+            methods: {
+                /**
+                 * 处理选择数据源触发
+                 */
+                handleDataSourceSelectChange(dataSourceSelect) {
+                    if(!dataSourceSelect) return;
+
+                    const _self = this;
+                    commonFun.ajaxSubmit({
+                        url: urls.selectUserTablesListByTbNameUr,
+                        datas: {dataSourceType: dataSourceSelect},
+                        backFunction: function (tableNameList) {
+                            _self.tableNameSelect = "";
+                            _self.tableColumns = [];
+                            _self.tableConditions = [];
+                            _self.tableNameOptions = tableNameList;
+                        }
+                    });
+                },
+                /**
+                 * 查询列字段
+                 */
+                handleSelectTable() {
+                    const _self = this;
+                    const dataSourceType = this.dataSourceSelect;
+                    this.tableName = this.tableNameSelect;
+
+                    commonFun.ajaxSubmit({
+                        url: urls.selectUserColCommentsListByTbNameUrl,
+                        datas: {
+                            tableName: _self.tableName,
+                            dataSourceType: dataSourceType
+                        },
+                        backFunction: function (tableColList) {
+                            _self.$_drawTable(tableColList);
+                            _self.$_drawTableConditions(tableColList);
+                        }
+                    });
+                },
+                /**
+                 * 画表格
+                 * @param tableColList
+                 */
+                $_drawTable(tableColList) {
+                    const _self = this;
+                    _self.tableColumns = [];
+                    for (let i = 0; i < tableColList.length; i++) {
+                        let item = tableColList[i];
+                        _self.tableColumns.push({
+                            //{tableName: "T_USER", columnName: "ID", comments: "主键"}
+                            id: item.columnName,
+                            prop: item.columnName,
+                            label: item.columnName + "：" + item.comments
+                        });
+                        _self.$refs.tableRef.clearTable();
+                    }
+                },
+                /**
+                 * 画表格的查询条件
+                 * @param tableColList
+                 */
+                $_drawTableConditions(tableColList) {
+                    const _self = this;
+                    _self.tableConditions = [];
+                    for (let i = 0; i < tableColList.length; i++) {
+                        let item = tableColList[i];
+                        _self.tableConditions.push({
+                            //{tableName: "T_USER", columnName: "ID", comments: "主键"}
+                            columnName: item.columnName,
+                            dataType: item.dataType,
+                            columnVal: "",
+                            dateValArray: []
+                        });
+                    }
+                },
+                /**
+                 * 根据查询条件获取表格数据
+                 */
+                handleQueryTableDataByCondition() {
+                    if(!this.tableName){
+                        return;
+                    }
+
+                    this.$refs.tableRef.reload(this.$_buildQueryParams());
+                },
+                /**
+                 * 构造查询参数
+                 */
+                $_buildQueryParams(){
+                    const tableName = this.tableName;
+                    const dataSourceType = this.dataSourceSelect;
+                    const tableConditions = this.tableConditions;
+
+                    const _self = this;
+                    tableConditions.forEach(function(x, i){
+                        if(_self.judgeIsDateType(x)){
+                            x.columnVal = null;
+                            x.startDateVal = (x.dateValArray && x.dateValArray.length > 0) ? x.dateValArray[0] : null;
+                            x.endDateVal = (x.dateValArray && x.dateValArray.length > 0) ? x.dateValArray[1] : null;
+                        }else{
+                            x.dateValArray = null;
+                            x.startDateVal = null;
+                            x.endDateVal = null;
+                        }
+                    });
+
+                    let params = {
+                        tableName: tableName,
+                        dataSourceType: dataSourceType,
+                        tableConditionsJson: tableConditions && JSON.stringify(tableConditions)
+                    };
+                    return params;
+                },
+
+                /**
+                 * 判断字段是否为日期类型
+                 * @param item
+                 * @returns {boolean}
+                 */
+                judgeIsDateType(item){
+                    return item.dataType.indexOf('TIMESTAMP') >= 0 || item.dataType.indexOf('DATE') >= 0;
+                },
+
+                /**
+                 * 根据查询条件导出表格数据
+                 */
+                handleExportTableDataByCondition(){
+                    if(!this.tableName){
+                        return;
+                    }
+
+                    this.$confirm('导出请慎重, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.$message({
+                            type: 'success',
+                            message: '正在导出，请稍等!'
+                        });
+                        let params = this.$_buildQueryParams();
+                        params.field = this.$refs.tableRef.field;
+                        params.direction = this.$refs.tableRef.direction;
+                        commonFun.openPostWindow(urls.exportExcelUrl, params, "_blank");
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消导出'
+                        });
+                    });
+                },
+
+                /**
+                 * 添加自定义查询条件
+                 */
+                handleAddCustomCondition(){
+
+                }
+            }
+        });
 </script>
 
 </body>
