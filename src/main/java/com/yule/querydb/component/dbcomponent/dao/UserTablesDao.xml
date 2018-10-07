@@ -29,7 +29,7 @@
         </if>
     </select>
 
-    <!--根据表名+查询条件 查询，需要防止 sql 注入      indexOf('TIMESTAMP') == 0 以什么开头-->
+    <!--根据表名+查询条件 查询，需要防止 sql 注入      indexOf('TIMESTAMP') == 0 表示以什么开头-->
     <select id="selectTableDataByConditions" resultType="map">
         select *
         from (select s.*, rownum rn
@@ -49,6 +49,7 @@
           from ${tableName} t
             where 1=1
             <include refid="Where_SelectTableDataByConditions"/>
+            <include refid="Where_SelectTableDataByCustomConditions"/>
 
             <if test="field !=null and field !='' and direction !=null and direction !=''" >
                 order by ${field} ${direction}
@@ -58,6 +59,84 @@
         where rn >= #{start} + 1
     </select>
 
+    <!--过滤用户自定义查询条件-->
+    <sql id="Where_SelectTableDataByCustomConditions">
+        <if test="customConditionList !=null and customConditionList.size() > 0">
+            and
+            <foreach collection="customConditionList" item="customCondition" open="(" separator="and" close=")">
+                <choose>
+                    <when test="customCondition.customConditionEnumCode == 'isNull'">
+                        ${customCondition.columnName} is null
+                    </when>
+                    <when test="customCondition.customConditionEnumCode == 'isNotNull'">
+                        ${customCondition.columnName} is not null
+                    </when>
+                    <when test="customCondition.startDateVal != null and customCondition.startDateVal != ''">
+                        <choose>
+                            <when test="customCondition.customConditionEnumCode == 'between'">
+                                to_char(${customCondition.columnName}, 'yyyy/MM/dd hh24:mi:ss') >= #{customCondition.startDateVal}
+                                and to_char(${customCondition.columnName}, 'yyyy/MM/dd hh24:mi:ss') &lt;= #{customCondition.endDateVal}
+                            </when>
+                            <when test="customCondition.customConditionEnumCode == 'notBetween'">
+                                to_char(${customCondition.columnName}, 'yyyy/MM/dd hh24:mi:ss') &lt; #{customCondition.startDateVal}
+                                and to_char(${customCondition.columnName}, 'yyyy/MM/dd hh24:mi:ss') > #{customCondition.endDateVal}
+                            </when>
+                        </choose>
+                    </when>
+                    <when test="customCondition.columnVal != null and customCondition.columnVal != ''">
+                        <choose>
+                            <when test="customCondition.customConditionEnumCode == 'equalTo'">
+                                ${customCondition.columnName} = #{customCondition.columnVal}
+                            </when>
+                            <when test="customCondition.customConditionEnumCode == 'notEqualTo'">
+                                ${customCondition.columnName} != #{customCondition.columnVal}
+                            </when>
+                            <when test="customCondition.customConditionEnumCode == 'greaterThan'">
+                                ${customCondition.columnName} > #{customCondition.columnVal}
+                            </when>
+                            <when test="customCondition.customConditionEnumCode == 'greaterThanOrEqualTo'">
+                                ${customCondition.columnName} >= #{customCondition.columnVal}
+                            </when>
+                            <when test="customCondition.customConditionEnumCode == 'lessThan'">
+                                ${customCondition.columnName} &lt; #{customCondition.columnVal}
+                            </when>
+                            <when test="customCondition.customConditionEnumCode == 'lessThanOrEqualTo'">
+                                ${customCondition.columnName} &lt;= #{customCondition.columnVal}
+                            </when>
+                            <when test="customCondition.customConditionEnumCode == 'like'">
+                                ${customCondition.columnName} like '%' || #{customCondition.columnVal} || '%'
+                            </when>
+                            <when test="customCondition.customConditionEnumCode == 'notLike'">
+                                ${customCondition.columnName} not like '%' || #{customCondition.columnVal} || '%'
+                            </when>
+                        </choose>
+                    </when>
+                    <when test="customCondition.valArray != null and customCondition.valArray.length > 0 ">
+                        <choose>
+                            <when test="customCondition.customConditionEnumCode == 'in'">
+                                ${customCondition.columnName} in
+                                <foreach collection="customCondition.valArray" open="(" close=")" separator="," item="inValue">
+                                    #{inValue}
+                                </foreach>
+                            </when>
+                            <when test="customCondition.customConditionEnumCode == 'notIn'">
+                                ${customCondition.columnName} not in
+                                <foreach collection="customCondition.valArray" open="(" close=")" separator="," item="inValue">
+                                    #{inValue}
+                                </foreach>
+                            </when>
+                        </choose>
+                    </when>
+                    <otherwise>
+                        1=1
+                    </otherwise>
+                </choose>
+
+            </foreach>
+        </if>
+    </sql>
+
+    <!--过滤查询条件-->
     <sql id="Where_SelectTableDataByConditions">
         <if test="colConditionList !=null and colConditionList.size() > 0">
             and
@@ -84,6 +163,7 @@
         select count(*) from ${tableName}
         where 1=1
         <include refid="Where_SelectTableDataByConditions"/>
+        <include refid="Where_SelectTableDataByCustomConditions"/>
     </select>
 
 </mapper>

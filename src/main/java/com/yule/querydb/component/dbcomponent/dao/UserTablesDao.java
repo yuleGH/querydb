@@ -1,5 +1,6 @@
 package com.yule.querydb.component.dbcomponent.dao;
 
+import com.yule.querydb.component.dbcomponent.entity.CustomCondition;
 import com.yule.querydb.component.dbcomponent.entity.UserColComments;
 import com.yule.querydb.component.dbcomponent.entity.UserTables;
 import org.apache.ibatis.annotations.Param;
@@ -31,7 +32,8 @@ public interface UserTablesDao {
      * 查询数量
      * @param tableName
      * @param colConditionList
+     * @param customConditionList
      * @return
      */
-    int selectTableDataCountByConditions(@Param("tableName") String tableName, @Param("colConditionList") List<UserColComments> colConditionList);
+    int selectTableDataCountByConditions(@Param("tableName") String tableName, @Param("colConditionList") List<UserColComments> colConditionList, @Param("customConditionList") List<CustomCondition> customConditionList);
 }

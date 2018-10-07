@@ -11,6 +11,9 @@
         .m-b20{
             margin-bottom: 20px;
         }
+        .m-b10{
+            margin-bottom: 10px;
+        }
         .m-t20{
             margin-top: 20px;
         }
@@ -53,6 +56,8 @@
 
         <el-col :span="4">
             <el-button type="primary" @click="handleSelectTable">查询列字段</el-button>
+        </el-col>
+        <el-col :span="4">
             <el-button type="primary" @click="handleAddCustomCondition">添加自定义查询条件</el-button>
         </el-col>
     </el-row>
@@ -61,6 +66,13 @@
     <table-conditions-component :table-conditions.sync="tableConditions"
                                 :judge-is-date-type="judgeIsDateType"
                                 :handle-query-table-data-by-condition="handleQueryTableDataByCondition"></table-conditions-component>
+
+    <!--自定义查询条件-->
+    <custom-conditions-component :custom-condition-array="customConditionArray"
+                                 :all-table-column-options="tableColumns"
+                                 :handle-del-custom-condition="handleDelCustomCondition"
+                                 :custom-condition-enum-options="customConditionEnumOptions"
+                                 :handle-query-table-data-by-condition="handleQueryTableDataByCondition"></custom-conditions-component>
 
     <el-row :gutter="20" class="m-b20">
         <el-col>
@@ -78,136 +90,7 @@
 <script type="text/javascript" src="/front/js/lib/vue.js"></script>
 <script type="text/javascript" src="/front/js/lib/elementui.js"></script>
 <script type="text/javascript" src="/front/js/common/common.js"></script>
-<script type="text/javascript" src="/front/js/common/paginationTool.js"></script>
-
-
-<!--表格组件，需要分页-->
-<div id="tableApp">
-    <div>
-        <el-table
-                class="m-b20"
-                :data="pageData"
-                border
-                v-loading="loading"
-                @sort-change="sortChange"
-                style="width: 100%">
-            <el-table-column
-                    v-for="(item, index) in tableColumns"
-                    :prop="item.prop"
-                    :label="item.label"
-                    :key="item.id"
-                    sortable="custom"
-                    show-overflow-tooltip
-            >
-            </el-table-column>
-        </el-table>
-
-        <!--分页-->
-        <el-pagination
-                class="t-center"
-                :page-size="pageSize" layout="prev, pager, next, jumper" :total="total"
-                :current-page="currentPage" @current-change="currentChange">
-        </el-pagination>
-    </div>
-</div>
-<script type="text/javascript">
-    const tableComponent = {
-        template: document.getElementById("tableApp").innerHTML,
-        mixins: [commonPageBar],
-        data: function () {
-            return {
-                autoLoad: false,
-                pageSize: 10,
-                url: urls.getTableDataUrl
-            }
-        },
-        props: {
-            tableColumns: {
-                type: Array,
-                required: true
-            }
-        },
-        methods: {
-            clearTable(){
-                this.pageData = [];
-                this.total = 0;
-                this.field = null;
-                this.direction = null;
-                this.currentPage = 0;
-            }
-        }
-    };
-</script>
-
-<!--查询条件组件-->
-<div id="tableConditionsApp">
-    <el-row :gutter="20" class="m-b20">
-        <div
-                v-for="(item,index) in tableConditions"
-                :key="item.columnName"
-        >
-            <template v-if="judgeIsDateType(item)">
-                <el-col :span="8" class="m-t20">
-                    <el-date-picker
-                            v-model="item.dateValArray"
-                            type="datetimerange"
-                            :editable="false"
-                            format="yyyy-MM-dd HH:mm:ss"
-                            value-format="yyyy-MM-dd HH:mm:ss"
-                            clearable
-                            range-separator="至"
-                            :start-placeholder="item.columnName"
-                            :end-placeholder="item.columnName">
-                    </el-date-picker>
-                </el-col>
-            </template>
-            <template v-else>
-                <el-col :span="4" class="m-t20">
-                    <el-input v-model="item.columnVal" :placeholder="item.columnName"
-                              @keyup.enter.native="handleQueryTableDataByCondition"></el-input>
-                </el-col>
-            </template>
-        </div>
-    </el-row>
-</div>
-<script type="text/javascript">
-    const tableConditionsComponent = {
-        template: document.getElementById("tableConditionsApp").innerHTML,
-        data: function () {
-            return {
-                curTableConditions: []
-            }
-        },
-        props: {
-            //表格查询条件
-            tableConditions: {
-                type: Array,
-                required: true
-            },
-            //判断是否是日期类型
-            judgeIsDateType : {
-                type: Function,
-                required: true
-            },
-            //表格查询方法
-            handleQueryTableDataByCondition: {
-                type: Function,
-                required: true
-            }
-        },
-        watch: {
-            tableConditions : function(newVal, oldVal){
-                this.curTableConditions = newVal;
-            },
-            curTableConditions : function(newVal, oldVal){
-                this.$emit("update:tableConditions", newVal);
-            }
-        },
-        methods: {
-
-        }
-    };
-</script>
+<script type="text/javascript" src="/front/js/lib/requirejs/require-2.3.5.js"></script>
 
 <script type="text/javascript">
     const urls = {
@@ -215,10 +98,12 @@
         getDbComponentDataSourcesUrl: "getDbComponentDataSources.json",
         selectUserTablesListByTbNameUr: "selectUserTablesListByTbName.json",
         selectUserColCommentsListByTbNameUrl: "selectUserColCommentsListByTbName.json",
-        exportExcelUrl: "exportExcelTableData.json"
+        exportExcelUrl: "exportExcelTableData.json",
+        getAllCustomConditionEnumUrl: "getAllCustomConditionEnum.json"
     }
 </script>
 <script type="text/javascript">
+require(["/front/js/common/require-main.js"], function(){
     new Vue({
             el: "#app",
             data: {
@@ -230,8 +115,11 @@
 
                 tableName: '', //当前查询的表名
 
-                tableColumns: [], //表格列名
-                tableConditions: [] //表格查询条件
+                tableColumns: [], //表格列名（当前表的所有表字段）
+                tableConditions: [], //表格查询条件
+                customConditionArray: [],  //表格自定义查询条件
+
+                customConditionEnumOptions: [] //表自定义枚举类型的所有选项
             },
             mounted() {
                 const _self = this;
@@ -243,11 +131,31 @@
                             _self.dataSourceOptions = dataSourceList;
                         }
                     });
+
+                    commonFun.ajaxSubmit({
+                        url: urls.getAllCustomConditionEnumUrl,
+                        datas: {},
+                        backFunction: function (data) {
+                            $.each(data, function(i, x){
+                                _self.customConditionEnumOptions.push({
+                                    code : i,
+                                    value : data[i]
+                                });
+                            });
+                        }
+                    });
                 });
             },
             components: {
-                'table-component': tableComponent,
-                'table-conditions-component': tableConditionsComponent
+                'table-component': function (resolve) {
+                    require([ '/front/page/component/table.js'], resolve);
+                },
+                'table-conditions-component': function (resolve) {
+                    require([ '/front/page/component/tableConditions.js'], resolve);
+                },
+                'custom-conditions-component': function (resolve) {
+                    require([ '/front/page/component/customConditions.js'], resolve);
+                }
             },
             methods: {
                 /**
@@ -264,6 +172,7 @@
                             _self.tableNameSelect = "";
                             _self.tableColumns = [];
                             _self.tableConditions = [];
+                            _self.customConditionArray = [];
                             _self.tableNameOptions = tableNameList;
                         }
                     });
@@ -341,6 +250,7 @@
                     const tableName = this.tableName;
                     const dataSourceType = this.dataSourceSelect;
                     const tableConditions = this.tableConditions;
+                    const customConditions = this.customConditionArray;
 
                     const _self = this;
                     tableConditions.forEach(function(x, i){
@@ -355,10 +265,23 @@
                         }
                     });
 
+                    customConditions.forEach(function(x, i){
+                        if(x.dateValArray && x.dateValArray.length > 0){
+                            x.columnVal = null;
+                            x.startDateVal = (x.dateValArray && x.dateValArray.length > 0) ? x.dateValArray[0] : null;
+                            x.endDateVal = (x.dateValArray && x.dateValArray.length > 0) ? x.dateValArray[1] : null;
+                        }else{
+                            x.dateValArray = null;
+                            x.startDateVal = null;
+                            x.endDateVal = null;
+                        }
+                    });
+
                     let params = {
                         tableName: tableName,
                         dataSourceType: dataSourceType,
-                        tableConditionsJson: tableConditions && JSON.stringify(tableConditions)
+                        tableConditionsJson: tableConditions && JSON.stringify(tableConditions),
+                        customConditionsJson: customConditions && JSON.stringify(customConditions)
                     };
                     return params;
                 },
@@ -405,10 +328,22 @@
                  * 添加自定义查询条件
                  */
                 handleAddCustomCondition(){
-
+                    this.customConditionArray.push({
+                        columnName: "",
+                        customConditionEnumCode: "",
+                        columnVal: "",
+                        dateValArray: ""
+                    });
+                },
+                /**
+                 * 删除自定义查询条件
+                 */
+                handleDelCustomCondition(index){
+                    this.customConditionArray.splice(index, 1);
                 }
             }
         });
+});
 </script>
 
 </body>

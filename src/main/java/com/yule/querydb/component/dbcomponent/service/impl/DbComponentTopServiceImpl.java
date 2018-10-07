@@ -1,5 +1,6 @@
 package com.yule.querydb.component.dbcomponent.service.impl;
 
+import com.yule.querydb.commonenum.CustomConditionEnum;
 import com.yule.querydb.component.dbcomponent.entity.UserColComments;
 import com.yule.querydb.component.dbcomponent.entity.UserTables;
 import com.yule.querydb.component.dbcomponent.service.DbComponentService;
@@ -64,14 +65,14 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
     }
 
     @Override
-    public Object getTableData(String tableName, String tableConditionsJson, String dataSourceType,
+    public Object getTableData(String tableName, String tableConditionsJson, String customConditionsJson, String dataSourceType,
                                Integer start, Integer limit, String field, String direction){
         DataSourceHolder.setDataSourceType(dataSourceType);
 
-        List<Map<String, String>> tableData = getTableDataList(start, limit, field, direction, tableName, tableConditionsJson);
+        List<Map<String, String>> tableData = getTableDataList(start, limit, field, direction, tableName, tableConditionsJson, customConditionsJson);
         int totalCount = 0;
         if(tableData.size() > 0){
-            totalCount = this.dbComponentService.getTableDataCount(tableName, tableConditionsJson);
+            totalCount = this.dbComponentService.getTableDataCount(tableName, tableConditionsJson, customConditionsJson);
         }
 
         Map result = new HashMap<>(2);
@@ -82,7 +83,7 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
 
     @Override
     public void exportExcelTableData(HttpServletRequest request, HttpServletResponse response,
-                                     String tableName, String tableConditionsJson, String dataSourceType,
+                                     String tableName, String tableConditionsJson, String customConditionsJson, String dataSourceType,
                                      String field, String direction) {
         DataSourceHolder.setDataSourceType(dataSourceType);
 
@@ -97,13 +98,24 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
             }
         }
 
-        List<Map<String, String>> tableData = getTableDataList(0, Integer.MAX_VALUE, field, direction, tableName, tableConditionsJson);
+        List<Map<String, String>> tableData = getTableDataList(0, Integer.MAX_VALUE, field, direction, tableName, tableConditionsJson, customConditionsJson);
 
         try {
             ExportExcelUtil.exportExcel(request, response, tableName, headerList, fieldList, tableData);
         } catch (Exception e) {
             logger.error("导出报错！", e);
         }
+    }
+
+    @Override
+    public Map<String, String> getAllCustomConditionEnum() {
+        Map<String, String> allEnumMap = new HashMap<>();
+        List<CustomConditionEnum> customConditionEnumList = CustomConditionEnum.getAllEnum();
+        for(CustomConditionEnum customConditionEnum : customConditionEnumList){
+            allEnumMap.put(customConditionEnum.getCode(), customConditionEnum.getValue());
+        }
+
+        return allEnumMap;
     }
 
     /**
@@ -116,13 +128,14 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
      * @param tableConditionsJson
      * @return
      */
-    private List<Map<String, String>> getTableDataList(Integer start, Integer limit, String field, String direction, String tableName, String tableConditionsJson) {
+    private List<Map<String, String>> getTableDataList(Integer start, Integer limit, String field, String direction, String tableName,
+                                                       String tableConditionsJson, String customConditionsJson) {
         Map<String, Object> pageConfMap = new HashMap<>(16);
         pageConfMap.put("start", start == null ? 0 : start);
         pageConfMap.put("limit", limit == null ? 0 : limit);
         pageConfMap.put("field", field);
         pageConfMap.put("direction", direction);
-        List<Map<String, String>> tableData = this.dbComponentService.getTableData(tableName, tableConditionsJson, pageConfMap);
+        List<Map<String, String>> tableData = this.dbComponentService.getTableData(tableName, tableConditionsJson, customConditionsJson, pageConfMap);
         return tableData;
     }
 

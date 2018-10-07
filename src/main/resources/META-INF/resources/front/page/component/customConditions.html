@@ -1,0 +1,43 @@
+<!--用户自定义查询条件-->
+<div>
+    <el-row :gutter="20" class="m-b10" v-for="(conditionObj,index) in customConditionArray" :key="index">
+        <el-col :span="6">
+            <el-select v-model="conditionObj.columnName" clearable filterable placeholder="请选择表字段">
+                <el-option
+                        v-for="item in allTableColumnOptions"
+                        :key="item.id"
+                        :label="item.label"
+                        :value="item.prop">
+                </el-option>
+            </el-select>
+        </el-col>
+        <el-col :span="6">
+            <el-select v-model="conditionObj.customConditionEnumCode" @change="handleCustomConditionEnumChange(conditionObj)" clearable filterable placeholder="请选择类型">
+                <el-option
+                        v-for="item in customConditionEnumOptions"
+                        :key="item.code"
+                        :label="item.value"
+                        :value="item.code">
+                </el-option>
+            </el-select>
+        </el-col>
+
+        <el-col :span="4" v-if="inputConditionEnums.indexOf(conditionObj.customConditionEnumCode) >= 0">
+            <el-input v-model.trim="conditionObj.columnVal" @keyup.enter.native="handleQueryTableDataByCondition"></el-input>
+        </el-col>
+        <el-col :span="8" v-if="dateConditionEnums.indexOf(conditionObj.customConditionEnumCode) >= 0">
+            <el-date-picker
+                    v-model="conditionObj.dateValArray"
+                    type="datetimerange"
+                    :editable="false"
+                    format="yyyy-MM-dd HH:mm:ss"
+                    value-format="yyyy-MM-dd HH:mm:ss"
+                    clearable
+                    range-separator="至">
+            </el-date-picker>
+        </el-col>
+        <el-col :span="2">
+            <el-button type="danger" icon="el-icon-delete" circle @click="handleDelCustomCondition(index)"></el-button>
+        </el-col>
+    </el-row>
+</div>

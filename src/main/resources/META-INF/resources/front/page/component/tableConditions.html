@@ -1,0 +1,29 @@
+<!--查询条件组件-->
+<el-row :gutter="20" class="m-b20">
+    <div
+            v-for="(item,index) in tableConditions"
+            :key="item.columnName"
+    >
+        <template v-if="judgeIsDateType(item)">
+            <el-col :span="8" class="m-t20">
+                <el-date-picker
+                        v-model="item.dateValArray"
+                        type="datetimerange"
+                        :editable="false"
+                        format="yyyy-MM-dd HH:mm:ss"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        clearable
+                        range-separator="至"
+                        :start-placeholder="item.columnName"
+                        :end-placeholder="item.columnName">
+                </el-date-picker>
+            </el-col>
+        </template>
+        <template v-else>
+            <el-col :span="4" class="m-t20">
+                <el-input v-model.trim="item.columnVal" :placeholder="item.columnName"
+                          @keyup.enter.native="handleQueryTableDataByCondition"></el-input>
+            </el-col>
+        </template>
+    </div>
+</el-row>

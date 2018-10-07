@@ -1,0 +1,27 @@
+<!--表格组件，需要分页-->
+<div>
+    <el-table
+            class="m-b20"
+            :data="pageData"
+            border
+            v-loading="loading"
+            @sort-change="sortChange"
+            style="width: 100%">
+        <el-table-column
+                v-for="(item, index) in tableColumns"
+                :prop="item.prop"
+                :label="item.label"
+                :key="item.id"
+                sortable="custom"
+                show-overflow-tooltip
+        >
+        </el-table-column>
+    </el-table>
+
+    <!--分页-->
+    <el-pagination
+            class="t-center"
+            :page-size="pageSize" layout="prev, pager, next, jumper" :total="total"
+            :current-page="currentPage" @current-change="currentChange">
+    </el-pagination>
+</div>

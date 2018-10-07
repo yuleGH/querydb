@@ -1,12 +1,14 @@
 package com.yule.querydb.component.dbcomponent.service;
 
 import com.yule.querydb.annotation.MyParam;
+import com.yule.querydb.commonenum.CustomConditionEnum;
 import com.yule.querydb.component.dbcomponent.entity.UserColComments;
 import com.yule.querydb.component.dbcomponent.entity.UserTables;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yule
@@ -40,9 +42,11 @@ public interface DbComponentTopService {
      *
      * @param tableName           表名
      * @param tableConditionsJson 表的查询条件
+     * @param customConditionsJson 表的自定义查询条件
      * @return
      */
     Object getTableData(@MyParam("tableName") String tableName, @MyParam("tableConditionsJson") String tableConditionsJson,
+                        @MyParam("customConditionsJson") String customConditionsJson,
                         @MyParam("dataSourceType") String dataSourceType,
                         @MyParam("start") Integer start, @MyParam("limit") Integer limit,
                         @MyParam("field") String field, @MyParam("direction") String direction);
@@ -54,12 +58,20 @@ public interface DbComponentTopService {
      * @param response
      * @param tableName
      * @param tableConditionsJson
+     * @param customConditionsJson
      * @param dataSourceType
      * @param field
      * @param direction
      */
     void exportExcelTableData(@MyParam("httpServletRequest") HttpServletRequest request, @MyParam("httpServletResponse") HttpServletResponse response,
                               @MyParam("tableName") String tableName, @MyParam("tableConditionsJson") String tableConditionsJson,
+                              @MyParam("customConditionsJson") String customConditionsJson,
                               @MyParam("dataSourceType") String dataSourceType,
                               @MyParam("field") String field, @MyParam("direction") String direction);
+
+    /**
+     * 查询所有的自定义查询条件的选项
+     * @return
+     */
+    Map<String, String> getAllCustomConditionEnum();
 }

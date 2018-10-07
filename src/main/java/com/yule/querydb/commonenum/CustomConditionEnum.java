@@ -9,16 +9,16 @@ import java.util.List;
  * @author yule
  * @date 2018/9/30 10:47
  */
-public enum QueryConditionEnum {
+public enum CustomConditionEnum {
     /*查询方式*/
     isNull("isNull", "isNull"),
     isNotNull("isNotNull", "isNotNull"),
-    equalTo("equalTo", "equalTo"),
-    notEqualTo("notEqualTo", "notEqualTo"),
-    greaterThan("greaterThan", "greaterThan"),
-    greaterThanOrEqualTo("greaterThanOrEqualTo", "greaterThanOrEqualTo"),
-    lessThan("lessThan", "lessThan"),
-    lessThanOrEqualTo("lessThanOrEqualTo", "lessThanOrEqualTo"),
+    equalTo("equalTo", "等于"),
+    notEqualTo("notEqualTo", "不等于"),
+    greaterThan("greaterThan", "大于"),
+    greaterThanOrEqualTo("greaterThanOrEqualTo", "大于等于"),
+    lessThan("lessThan", "小于"),
+    lessThanOrEqualTo("lessThanOrEqualTo", "小于等于"),
     in("in", "in"),
     notIn("notIn", "notIn"),
     between("between", "between"),
@@ -36,7 +36,7 @@ public enum QueryConditionEnum {
      * @param code
      * @param value
      */
-    QueryConditionEnum(String code, String value){
+    CustomConditionEnum(String code, String value){
         this.code = code;
         this.value = value;
     }
@@ -54,8 +54,8 @@ public enum QueryConditionEnum {
      * @param code
      * @return
      */
-    public static QueryConditionEnum getByCode(String code){
-        for(QueryConditionEnum _enum : values()){
+    public static CustomConditionEnum getByCode(String code){
+        for(CustomConditionEnum _enum : values()){
             if(_enum.getCode().equals(code)){
                 return _enum;
             }
@@ -67,9 +67,9 @@ public enum QueryConditionEnum {
      * 获取全部枚举对象
      * @return
      */
-    public static List<QueryConditionEnum> getAllEnum(){
-        List<QueryConditionEnum> queryConditionEnums = Arrays.asList(values());
-        List<QueryConditionEnum> list = new ArrayList<>(queryConditionEnums);
+    public static List<CustomConditionEnum> getAllEnum(){
+        List<CustomConditionEnum> customConditionEnums = Arrays.asList(values());
+        List<CustomConditionEnum> list = new ArrayList<>(customConditionEnums);
         return list;
     }
 
@@ -79,7 +79,7 @@ public enum QueryConditionEnum {
      */
     public static List<String> getAllEnumCode(){
         List<String> list = new ArrayList<>();
-        for(QueryConditionEnum _enum : values()){
+        for(CustomConditionEnum _enum : values()){
             list.add(_enum.getCode());
         }
         return list;
@@ -91,7 +91,7 @@ public enum QueryConditionEnum {
      */
     public static List<String> getAllEnumValue(){
         List<String> list = new ArrayList<>();
-        for(QueryConditionEnum _enum : values()){
+        for(CustomConditionEnum _enum : values()){
             list.add(_enum.value);
         }
         return list;

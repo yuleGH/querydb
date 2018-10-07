@@ -76,7 +76,7 @@ public class QueryDbDispatcherServlet extends HttpServlet {
                 logger.error("访问querydb ajax报错！", e);
                 response.setStatus(500);
 //                response.getWriter().write(ExceptionUtil.getStackTrace(e));
-                response.getWriter().write("服务器端未知错误");
+                response.getWriter().write("服务器端未知错误：" + e.getMessage());
             }
         }else {
             //返回文件流  包含这种".html"
@@ -146,6 +146,7 @@ public class QueryDbDispatcherServlet extends HttpServlet {
         if(!flag){
             logger.error("404-找不到地址：{}", path);
             response.setStatus(404);
+            response.getWriter().write("404-找不到地址：" + path);
         }
     }
 
