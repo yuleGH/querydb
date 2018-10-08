@@ -38,7 +38,7 @@
             select
             <foreach collection="allTableColCommentsListByDelLimit" item="column" open="" close="" separator=",">
                 <choose>
-                    <when test="column.dataType == 'DATA' or column.dataType.indexOf('TIMESTAMP') == 0 ">
+                    <when test="column.dataType == 'DATE' or column.dataType.indexOf('TIMESTAMP') == 0 ">
                         to_char(t.${column.columnName}, 'yyyy-MM-dd hh24:mi:ss') ${column.columnName}
                     </when>
                     <otherwise>
