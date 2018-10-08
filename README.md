@@ -16,6 +16,3 @@
 5. 页面支持查询条件动态组装。
 <br>（参考类：com.yule.querydb.commonenum.CustomConditionEnum）
 6. 现支持 oracle 数据库。
-
-待解决问题：
-1. excel 查询中文乱码
