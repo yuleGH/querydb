@@ -1,4 +1,4 @@
-define(['text!'+'/front/page/component/table.html', "/front/js/common/paginationTool.js"], function(template){
+define(['text!'+'/querydb/component/table.html', "/front/js/common/paginationTool.js"], function(template){
 
     const component = {
         template: template,

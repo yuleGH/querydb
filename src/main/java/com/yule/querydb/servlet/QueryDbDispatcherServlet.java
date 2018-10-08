@@ -91,7 +91,7 @@ public class QueryDbDispatcherServlet extends HttpServlet {
      */
     private void returnErrorPage(HttpServletResponse response) throws IOException {
         //不走后台了，以免循环重定向
-        response.sendRedirect("/front/page/error.html");
+        response.sendRedirect("/querydb/error.html");
     }
 
     /**
@@ -103,7 +103,7 @@ public class QueryDbDispatcherServlet extends HttpServlet {
     private void return404Page(HttpServletResponse response, String path) throws IOException {
         logger.error("404-找不到地址：{}", path);
         //不走后台了，以免循环重定向
-        response.sendRedirect("/front/page/404.html");
+        response.sendRedirect("/querydb/404.html");
     }
 
     /**

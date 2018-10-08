@@ -1,4 +1,4 @@
-define(['text!'+'/front/page/component/customConditions.html'], function(template){
+define(['text!'+'/querydb/component/customConditions.html'], function(template){
 
     const component = {
         template: template,

@@ -18,14 +18,14 @@
     <description>配置mybatis数据源和配置service</description>
 
     <!-- 加载配置文件 -->
-    <context:property-placeholder location="classpath*:conf/system/*.properties"/>
+    <context:property-placeholder location="classpath*:conf/system/querydb.properties"/>
 
     <!-- 需要 commons.dbcp 包 -->
     <bean id="firstDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="${db.driver}"/>
-        <property name="url" value="${db.datasourceurl}"/>
-        <property name="username" value="${db.username}"/>
-        <property name="password" value="${db.password}"/>
+        <property name="driverClassName" value="${first.db.driver}"/>
+        <property name="url" value="${first.db.datasourceurl}"/>
+        <property name="username" value="${first.db.username}"/>
+        <property name="password" value="${first.db.password}"/>
 
         <property name="maxActive" value="100"/>
         <property name="maxIdle" value="20"/>
@@ -62,12 +62,12 @@
     <!--<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"></bean>-->
 
     <!--配置数据源路由-->
-    <bean id="dataSource" class="com.yule.querydb.datasource.RoutingDataSource">
+    <bean id="querydbDataSource" class="com.yule.querydb.datasource.RoutingDataSource">
         <!-- 为targetDataSources注入两个数据源 -->
         <property name="targetDataSources">
             <map key-type="java.lang.String">
-                <entry key="db1" value-ref="firstDataSource"/>
-                <entry key="db2" value-ref="secondDataSource"/>
+                <entry key="firstDb" value-ref="firstDataSource"/>
+                <entry key="secondDb" value-ref="secondDataSource"/>
             </map>
         </property>
         <!-- 为指定数据源RoutingDataSource注入默认的数据源-->
@@ -75,14 +75,14 @@
     </bean>
 
     <!-- mybatis为spring提供的jar,其配置时不支持正则表达式配置 -->
-    <bean id="mySqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
+    <bean id="querydbSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="querydbDataSource"/>
         <property name="typeAliasesPackage" value="com.yule.querydb.*.*.entity"/>
         <property name="configLocation" value="classpath:/querydb/mybatis/mybatis-configuration.xml"/>
     </bean>
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.yule.querydb.*.*.dao"/>
-        <property name="sqlSessionFactoryBeanName" value="mySqlSessionFactory"/>
+        <property name="sqlSessionFactoryBeanName" value="querydbSqlSessionFactory"/>
     </bean>
 
     <!-- 自动注册service 必须在配置事务之上，否则@Transactional不起作用-->

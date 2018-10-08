@@ -10,7 +10,7 @@
   <!--还需要在 web.xml 配置读取所有相关的 spring 配置文件-->
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>classpath*:querydb/example/spring-mybatis-querydb.xml</param-value>
+    <param-value>classpath*:querydb/example/spring-mybatis-querydb-custom.xml</param-value>
   </context-param>
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
