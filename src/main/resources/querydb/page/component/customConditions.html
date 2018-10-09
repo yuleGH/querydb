@@ -1,7 +1,7 @@
 <!--用户自定义查询条件-->
 <div>
     <el-row :gutter="20" class="m-b10" v-for="(conditionObj,index) in customConditionArray" :key="index">
-        <el-col :span="6">
+        <el-col :span="5">
             <el-select v-model="conditionObj.columnName" clearable filterable placeholder="请选择表字段">
                 <el-option
                         v-for="item in allTableColumnOptions"
@@ -11,7 +11,7 @@
                 </el-option>
             </el-select>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="5">
             <el-select v-model="conditionObj.customConditionEnumCode" @change="handleCustomConditionEnumChange(conditionObj)" clearable filterable placeholder="请选择类型">
                 <el-option
                         v-for="item in customConditionEnumOptions"
