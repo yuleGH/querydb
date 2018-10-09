@@ -24,18 +24,18 @@ public class GenerateCellStyleUtil {
     public static HSSFCellStyle getBodyYellowStyle(HSSFWorkbook workbook) {
         HSSFCellStyle style2 = workbook.createCellStyle();
         style2.setFillForegroundColor(HSSFColor.WHITE.index);
-        style2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//        style2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        style2.setBorderBottom(BorderStyle.THIN);
-        style2.setBorderLeft(BorderStyle.THIN);
-        style2.setBorderRight(BorderStyle.THIN);
-        style2.setBorderTop(BorderStyle.THIN);
+//        style2.setBorderBottom(BorderStyle.THIN);
+//        style2.setBorderLeft(BorderStyle.THIN);
+//        style2.setBorderRight(BorderStyle.THIN);
+//        style2.setBorderTop(BorderStyle.THIN);
 
-        style2.setAlignment(HorizontalAlignment.CENTER);
-        style2.setVerticalAlignment(VerticalAlignment.CENTER);
+//        style2.setAlignment(HorizontalAlignment.CENTER);
+//        style2.setVerticalAlignment(VerticalAlignment.CENTER);
 
         HSSFFont font2 = workbook.createFont();
-        font2.setBold(false);
+//        font2.setBold(false);
         style2.setFont(font2);
 
         return style2;
@@ -51,22 +51,22 @@ public class GenerateCellStyleUtil {
         //set the foreground fill color Note: Ensure Foreground color is set prior to background color.
         style.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
         //设置为一个填充单元格的前景颜色。
-        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         // 设置边框
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
+//        style.setBorderBottom(BorderStyle.THIN);
+//        style.setBorderLeft(BorderStyle.THIN);
+//        style.setBorderRight(BorderStyle.THIN);
+//        style.setBorderTop(BorderStyle.THIN);
         //设置水平居中
-        style.setAlignment(HorizontalAlignment.CENTER);
+//        style.setAlignment(HorizontalAlignment.CENTER);
         //设置垂直居中
-        style.setVerticalAlignment(VerticalAlignment.CENTER);
+//        style.setVerticalAlignment(VerticalAlignment.CENTER);
 
         HSSFFont font = workbook.createFont();
         font.setColor(HSSFColor.VIOLET.index);
         font.setFontHeightInPoints((short) 12);
         // 字体加粗
-        font.setBold(true);
+//        font.setBold(true);
         style.setFont(font);
 
         return style;

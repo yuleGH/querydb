@@ -30,7 +30,7 @@ public class GenerateFontUtil {
      */
     public static HSSFFont getRedAndBoldFont(HSSFWorkbook workbook) {
         HSSFFont redAndBoldFont = getRedFont(workbook);
-        redAndBoldFont.setBold(true);
+//        redAndBoldFont.setBold(true);
         return redAndBoldFont;
     }
 
@@ -78,7 +78,7 @@ public class GenerateFontUtil {
 
     private static HSSFFont getFont(HSSFWorkbook workbook){
         HSSFFont font2 = workbook.createFont();
-        font2.setBold(false);
+//        font2.setBold(false);
         return font2;
     }
 }
