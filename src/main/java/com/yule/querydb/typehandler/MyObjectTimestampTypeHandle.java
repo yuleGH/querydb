@@ -16,16 +16,14 @@ import java.sql.SQLException;
 import java.util.Date;
 
 /**
+ * 自定义处理 JdbcType.TIMESTAMP 和 java Object（Data）
  * 模仿 ObjectTypeHandle 来处理 timestamp 报错问题
  * @author yule
  * @date 2018/9/26 22:43
  */
 @MappedTypes({Object.class})
 @MappedJdbcTypes(value = {JdbcType.TIMESTAMP})
-public class MyObjectTypeHandle extends BaseTypeHandler<Object> {
-
-    public MyObjectTypeHandle() {
-    }
+public class MyObjectTimestampTypeHandle extends BaseTypeHandler<Object> {
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType) throws SQLException {

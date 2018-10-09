@@ -8,7 +8,13 @@
     </settings>
 
     <typeHandlers>
-        <!--自定义处理 JdbcType.TIMESTAMP 和 java Object-->
-        <typeHandler handler="com.yule.querydb.typehandler.MyObjectTypeHandle"/>
+        <!--自定义处理 JdbcType.TIMESTAMP 和 java Object（Data）-->
+        <typeHandler handler="com.yule.querydb.typehandler.MyObjectTimestampTypeHandle"/>
+        <!--自定义处理 JdbcType.Clob 和 java Object（String）-->
+        <typeHandler handler="com.yule.querydb.typehandler.MyObjectClobTypeHandle"/>
+        <!--自定义处理 JdbcType.Blob 和 java Object（String）-->
+        <typeHandler handler="com.yule.querydb.typehandler.MyObjectBlobTypeHandle"/>
+        <!--自定义处理 JdbcType.LONGVARCHAR 和 java Object（String）-->
+        <typeHandler handler="com.yule.querydb.typehandler.MyObjectLongTypeHandle"/>
     </typeHandlers>
 </configuration>
