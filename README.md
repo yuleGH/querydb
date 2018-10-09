@@ -14,6 +14,7 @@
 5. 页面支持查询条件动态组装（没有 sql 注入）。
 <br>（参考类：com.yule.querydb.commonenum.CustomConditionEnum）
 6. 现支持 oracle 数据库。
+7. 现支持 oracle 大字段类型：Long、Blob、Clob
 
 ### 配置步骤
 1. 加 pom 文件
@@ -24,7 +25,4 @@
 
 ### 待解决问题
 1. 导出 jar 包冲突  csv文件
-2. 大字段设置jdbcType
-3. spring-mybatis-querydb.xml 配置固定化
-4. 默认查询条件收起
 5. 写配置文档
