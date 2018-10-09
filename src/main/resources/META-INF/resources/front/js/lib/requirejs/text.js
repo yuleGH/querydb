@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license text 2.0.15 Copyright jQuery Foundation and other contributors.
  * Released under MIT license, http://github.com/requirejs/text/LICENSE
  */

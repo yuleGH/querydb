@@ -1,4 +1,4 @@
-require.config({
+﻿require.config({
     // baseUrl: '/',
     paths: {
         text: '/front/js/lib/requirejs/text',

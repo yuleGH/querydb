@@ -1,4 +1,4 @@
-!function(e, t) {
+﻿!function(e, t) {
     "object" == typeof exports && "object" == typeof module ? module.exports = t(require("vue")) : "function" == typeof define && define.amd ? define("ELEMENT", ["vue"], t) : "object" == typeof exports ? exports.ELEMENT = t(require("vue")) : e.ELEMENT = t(e.Vue)
 }(this, function(e) {
     return function(e) {
