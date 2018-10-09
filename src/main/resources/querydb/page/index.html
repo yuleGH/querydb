@@ -29,8 +29,8 @@
 </head>
 <body>
 <div id="app" v-cloak>
-    <el-row :gutter="20">
-        <el-col :span="6">
+    <el-row :gutter="20" class="m-b10">
+        <el-col :span="5">
             <el-select v-model="dataSourceSelect" @change="handleDataSourceSelectChange" clearable filterable placeholder="请选择数据源">
                 <el-option
                         v-for="item in dataSourceOptions"
@@ -41,7 +41,7 @@
             </el-select>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="5">
             <el-select v-model="tableNameSelect" clearable filterable placeholder="请选择表名">
                 <el-option
                         v-for="item in tableNameOptions"
@@ -54,16 +54,20 @@
             </el-select>
         </el-col>
 
-        <el-col :span="4">
+        <el-col :span="3">
             <el-button type="primary" @click="handleSelectTable">查询列字段</el-button>
+        </el-col>
+        <el-col :span="5">
+            <el-button type="primary" @click="showTableConditionHtml = !showTableConditionHtml">显示/隐藏所有默认查询条件</el-button>
         </el-col>
         <el-col :span="4">
             <el-button type="primary" @click="handleAddCustomCondition">添加自定义查询条件</el-button>
         </el-col>
     </el-row>
 
-    <!--查询条件-->
-    <table-conditions-component :table-conditions.sync="tableConditions"
+    <!--所有默认查询条件-->
+    <table-conditions-component v-if="showTableConditionHtml"
+                                :table-conditions.sync="tableConditions"
                                 :judge-is-date-type="judgeIsDateType"
                                 :handle-query-table-data-by-condition="handleQueryTableDataByCondition"></table-conditions-component>
 
@@ -107,6 +111,8 @@ require(["/front/js/common/require-main.js"], function(){
     new Vue({
             el: "#app",
             data: {
+                showTableConditionHtml: false,//显示默认查询条件
+
                 tableNameOptions: [], //表下拉框
                 tableNameSelect: '', //表下拉框选中数据
 
@@ -220,6 +226,8 @@ require(["/front/js/common/require-main.js"], function(){
                  * @param tableColList
                  */
                 $_drawTableConditions(tableColList) {
+                    this.showTableConditionHtml = false;
+
                     const _self = this;
                     _self.tableConditions = [];
                     for (let i = 0; i < tableColList.length; i++) {
