@@ -14,7 +14,7 @@ import java.sql.*;
  * @author yule
  * @date 2018/10/9 19:18
  */
-@MappedTypes({Object.class})
+@MappedTypes({Object.class, String.class})
 @MappedJdbcTypes(value = {JdbcType.LONGVARCHAR})
 public class MyObjectLongTypeHandle extends BaseTypeHandler<Object> {
     @Override

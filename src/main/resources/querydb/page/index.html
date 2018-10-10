@@ -66,7 +66,7 @@
     </el-row>
 
     <!--所有默认查询条件-->
-    <table-conditions-component v-if="showTableConditionHtml"
+    <table-conditions-component v-show="showTableConditionHtml"
                                 :table-conditions.sync="tableConditions"
                                 :judge-is-date-type="judgeIsDateType"
                                 :handle-query-table-data-by-condition="handleQueryTableDataByCondition"></table-conditions-component>
