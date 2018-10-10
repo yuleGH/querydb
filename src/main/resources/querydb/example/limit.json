@@ -1,6 +1,7 @@
 //配置查询表的限制；默认空数组 []；
 //举例：canQueryTables 表示可以查询的表，必填
 //forbidQueryColumns 表示禁止查询的表字段，可以为空，可以没有这个字段
+// select wm_concat(table_name) from user_tables; 查询所有的表名字符串
 {
   "canQueryTables": ["t_user"],
   "forbidQueryColumns": [

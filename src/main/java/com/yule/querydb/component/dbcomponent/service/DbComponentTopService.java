@@ -21,7 +21,7 @@ public interface DbComponentTopService {
      *
      * @return
      */
-    List<String> getDbComponentDataSources();
+    Object getDbComponentDataSources();
 
     /**
      * 查询所有表名，有限制私密

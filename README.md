@@ -17,12 +17,48 @@
 ### 二、配置步骤
 #### 1、引入依赖
 目前版本为1.0-SNAPSHOT
+<br>
+##### 1.1 如果这个包在仓库里，则添加如下依赖
 ```xml
 <dependency>
     <groupId>com.yule</groupId>
     <artifactId>querydb</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
+```
+##### 1.2 如果需要将包放在工程里，则添加如下依赖
+假设这个 jar 包放在 WEB-INF/lib 文件夹下。
+```xml
+<!--自定义查询组件的jar包-->
+<dependency>
+    <groupId>com.yule</groupId>
+    <artifactId>querydb</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/querydb-1.0-SNAPSHOT.jar</systemPath>
+</dependency>
+```
+然后添加插件
+```xml
+<!--引用工程jar包-->
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <version>2.0</version>
+    <executions>
+        <execution>
+            <id>copy-dependencies</id>
+            <phase>compile</phase>
+            <goals>
+                <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+                <outputDirectory>${project.basedir}/WebContent/WEB-INF/lib</outputDirectory>
+                <includeScope>system</includeScope>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
 ```
 #### 2、配置 spring 的上下文
 如果是 springMVC 框架，则在 springMVC 的配置文件中加如下配置：
@@ -76,13 +112,16 @@ first.db.password=test1234
 <br>
 这里的 dbComponentDataSources 指的是定义的数据源 id，必须与步骤 3 中的定义一致。
 <br>
-这里的 dbComponentDataSourceLimitJsonUrls 指的是限制 json 文件的路径
+这里的 dbComponentDataSourceNames 指的是定义的数据源名字，前端显示，与 dbComponentDataSources 对应。
+<br>
+这里的 dbComponentDataSourceLimitJsonUrls 指的是限制 json 文件的路径。
 <br>
 如果使用的是默认的配置，则这里给出示例：
 ```properties
 #单数据源 与配置 querydb/conf/spring-mybatis-querydb-single.xml 一致
 #单表查询组件的数据源切换
 dbComponentDataSources=firstDb
+dbComponentDataSourceNames=数据源一
 #表数据私密性设置，对应 dbComponentDataSources 数据源
 dbComponentDataSourceLimitJsonUrls=conf/dbcomponent/limit.json
 ```
@@ -90,6 +129,7 @@ dbComponentDataSourceLimitJsonUrls=conf/dbcomponent/limit.json
 #双数据源 与配置 querydb/conf/spring-mybatis-querydb-double.xml 一致
 #单表查询组件的数据源切换
 dbComponentDataSources=firstDb,secondDb
+dbComponentDataSourceNames=数据源一,数据源二
 #表数据私密性设置，对应 dbComponentDataSources 数据源
 dbComponentDataSourceLimitJsonUrls=conf/dbcomponent/limit.json,conf/dbcomponent/limit2.json
 ```
@@ -128,7 +168,7 @@ dbComponentDataSourceLimitJsonUrls=conf/dbcomponent/limit.json,conf/dbcomponent/
   </servlet-mapping>
 ```
 #### 5、配置表查询的限制： limit.json
-示例
+示例1
 ```javaScript
 //配置查询表的限制；默认空数组 []；
 //举例：canQueryTables 表示可以查询的表，必填
@@ -141,5 +181,16 @@ dbComponentDataSourceLimitJsonUrls=conf/dbcomponent/limit.json,conf/dbcomponent/
       "tableColumns": ["id"]
     }
   ]
+}
+```
+示例2
+```javaScript
+{
+}
+```
+示例3
+```javaScript
+{
+    "canQueryTables": ["t_user", "t_book"]
 }
 ```

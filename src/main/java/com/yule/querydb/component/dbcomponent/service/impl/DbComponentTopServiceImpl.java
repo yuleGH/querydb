@@ -5,6 +5,7 @@ import com.yule.querydb.component.dbcomponent.entity.UserColComments;
 import com.yule.querydb.component.dbcomponent.entity.UserTables;
 import com.yule.querydb.component.dbcomponent.service.DbComponentService;
 import com.yule.querydb.component.dbcomponent.service.DbComponentTopService;
+import com.yule.querydb.component.dbcomponent.utils.DbDataSourceNameUtil;
 import com.yule.querydb.datasource.DataSourceHolder;
 import com.yule.querydb.utils.CommonUtil;
 import com.yule.querydb.utils.excel.ExportExcelUtil;
@@ -41,13 +42,9 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
     @Autowired
     private DbComponentService dbComponentService;
 
-    @Value("${dbComponentDataSources}")
-    private String dbComponentDataSources;
-
     @Override
-    public List<String> getDbComponentDataSources(){
-        String[] dataSourceArray = dbComponentDataSources.split(",");
-        return Arrays.asList(dataSourceArray);
+    public Object getDbComponentDataSources(){
+        return DbDataSourceNameUtil.getDbDataSourceNamesMap();
     }
 
     @Override

@@ -31,12 +31,12 @@
 <div id="app" v-cloak>
     <el-row :gutter="20" class="m-b10">
         <el-col :span="5">
-            <el-select v-model="dataSourceSelect" @change="handleDataSourceSelectChange" clearable filterable placeholder="请选择数据源">
+            <el-select v-model="dataSourceSelect" @change="handleDataSourceSelectChange" filterable placeholder="请选择数据源">
                 <el-option
                         v-for="item in dataSourceOptions"
-                        :key="item"
-                        :label="item"
-                        :value="item">
+                        :key="item.key"
+                        :label="item.value"
+                        :value="item.key">
                 </el-option>
             </el-select>
         </el-col>
@@ -134,7 +134,12 @@ require(["/front/js/common/require-main.js"], function(){
                         url: urls.getDbComponentDataSourcesUrl,
                         datas: {},
                         backFunction: function (dataSourceList) {
-                            _self.dataSourceOptions = dataSourceList;
+                            $.each(dataSourceList, function(i, x){
+                                _self.dataSourceOptions.push({
+                                    key : i,
+                                    value : x
+                                });
+                            });
                         }
                     });
 
@@ -145,7 +150,7 @@ require(["/front/js/common/require-main.js"], function(){
                             $.each(data, function(i, x){
                                 _self.customConditionEnumOptions.push({
                                     code : i,
-                                    value : data[i]
+                                    value : x
                                 });
                             });
                         }
@@ -311,7 +316,7 @@ require(["/front/js/common/require-main.js"], function(){
                         return;
                     }
 
-                    this.$confirm('导出请慎重, 是否继续?', '提示', {
+                    this.$confirm('导出请慎重, 数据量太大会影响系统性能，是否继续?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
