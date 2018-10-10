@@ -47,7 +47,7 @@
 表示配置双数据源，数据源的配置文件路径默认为：conf/system/querydb.properties
 <br>
 配置示例：
-```xml
+```properties
 first.db.driver=oracle.jdbc.OracleDriver
 first.db.datasourceurl=jdbc:oracle:thin:@localhost:1521:ORCL
 first.db.username=testdev
@@ -63,7 +63,7 @@ second.db.password=test2
 表示配置单数据源，数据源的配置文件路径默认为：conf/system/querydb.properties
 <br>
 配置示例：
-```xml
+```properties
 first.db.driver=oracle.jdbc.OracleDriver
 first.db.datasourceurl=jdbc:oracle:thin:@localhost:1521:ORCL
 first.db.username=testdev
