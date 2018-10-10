@@ -79,14 +79,14 @@ first.db.password=test1234
 这里的 dbComponentDataSourceLimitJsonUrls 指的是限制 json 文件的路径
 <br>
 如果使用的是默认的配置，则这里给出示例：
-```xml
+```properties
 #单数据源 与配置 querydb/conf/spring-mybatis-querydb-single.xml 一致
 #单表查询组件的数据源切换
 dbComponentDataSources=firstDb
 #表数据私密性设置，对应 dbComponentDataSources 数据源
 dbComponentDataSourceLimitJsonUrls=conf/dbcomponent/limit.json
 ```
-```xml
+```properties
 #双数据源 与配置 querydb/conf/spring-mybatis-querydb-double.xml 一致
 #单表查询组件的数据源切换
 dbComponentDataSources=firstDb,secondDb
