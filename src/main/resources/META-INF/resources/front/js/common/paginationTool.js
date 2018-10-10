@@ -25,12 +25,24 @@ var commonPageBar = {
         sortChange : function(e){
             this.sortLoad(e.prop, e.order);
         },
-        //pageSize 改变时会触发
+        //currentPage 改变时会触发
         currentChange: function (pageNum) {
             var _self = this;
             pageNum = pageNum == undefined ? 1 : pageNum;
             _self.currentPageNum = pageNum;
             _self.currentPage = pageNum;
+            _self.$_loadData();
+        },
+        /**
+         * 更换每页多少条时
+         * pageSize 改变时会触发
+         * @param val
+         */
+        handleSizeChange: function(val){
+            var _self = this;
+            _self.currentPageNum = 1;
+            _self.currentPage = 1;
+            _self.pageSize = val;
             _self.$_loadData();
         },
 
