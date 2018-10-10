@@ -42,9 +42,8 @@
   </listener>
 ```
 ##### 3.1 这里给出了两个默认的配置文件路径：
-1. querydb/conf/spring-mybatis-querydb-double.xml
-<br>
-表示配置双数据源，数据源的配置文件路径默认为：conf/system/querydb.properties
+###### 1. querydb/conf/spring-mybatis-querydb-double.xml
+表示配置双数据源，数据源的配置文件路径默认为：**conf/system/querydb.properties**
 <br>
 配置示例：
 ```properties
@@ -58,9 +57,8 @@ second.db.datasourceurl=jdbc:oracle:thin:@localhost:1521:ORCL
 second.db.username=testdev2
 second.db.password=test2
 ```
-2. querydb/conf/spring-mybatis-querydb-single.xml
-<br>
-表示配置单数据源，数据源的配置文件路径默认为：conf/system/querydb.properties
+###### 2. querydb/conf/spring-mybatis-querydb-single.xml
+表示配置单数据源，数据源的配置文件路径默认为：**conf/system/querydb.properties**
 <br>
 配置示例：
 ```properties
