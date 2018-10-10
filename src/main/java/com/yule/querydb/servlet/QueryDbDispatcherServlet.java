@@ -28,11 +28,21 @@ public class QueryDbDispatcherServlet extends HttpServlet {
      */
     private final String RESOURCE_PATH = "querydb/page";
 
+    /**
+     * 默认的配置文件的路径
+     */
+    private final String DEFAULT_CONFIG_PROPERTIES_PATH = "/conf/system/querydb.properties";
+
     private final Logger logger = LoggerFactory.getLogger(QueryDbDispatcherServlet.class);
 
     @Override
     public void init(ServletConfig config) throws ServletException {
-        PropertiesUtils.init(config.getInitParameter("propertiesPath"));
+        String configPropertiesPath = config.getInitParameter("propertiesPath");
+        if(CommonUtil.isEmpty(configPropertiesPath)){
+            configPropertiesPath = DEFAULT_CONFIG_PROPERTIES_PATH;
+        }
+
+        PropertiesUtils.init(configPropertiesPath);
         super.init(config);
     }
 
