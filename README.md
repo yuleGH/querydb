@@ -1,7 +1,12 @@
 # querydb
 通用查询数据库的组件，jar包，有前后台（js/css/字体文件）
+<br>
 
-实现：maven + servlet（3.x以上） + spring + mybatis
+博客地址：https://www.cnblogs.com/yuxiaole/p/9775016.html
+
+实现：maven + servlet（3.x以上） + spring + mybatis + oracle
+<br>
+前端实现：vue + element ui + require.js 的 CDN 方式
 
 ### 一、实现的功能
 1. 代码 down 下来，可以打包为 jar 包供其他项目使用。

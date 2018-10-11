@@ -16,7 +16,7 @@ import java.sql.*;
  * @date 2018/10/9 17:57
  */
 @MappedTypes({Object.class})
-@MappedJdbcTypes(value = {JdbcType.BLOB, JdbcType.LONGVARCHAR})
+@MappedJdbcTypes(value = {JdbcType.BLOB})
 public class MyObjectBlobTypeHandle extends BaseTypeHandler<Object> {
 
     @Override
@@ -35,7 +35,7 @@ public class MyObjectBlobTypeHandle extends BaseTypeHandler<Object> {
             returnValue = blob.getBytes(1L, (int)blob.length());
         }
 
-        return new String(returnValue);
+        return returnValue == null ? "" : new String(returnValue);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MyObjectBlobTypeHandle extends BaseTypeHandler<Object> {
             returnValue = blob.getBytes(1L, (int)blob.length());
         }
 
-        return new String(returnValue);
+        return returnValue == null ? "" : new String(returnValue);
     }
 
     @Override
@@ -57,6 +57,6 @@ public class MyObjectBlobTypeHandle extends BaseTypeHandler<Object> {
             returnValue = blob.getBytes(1L, (int)blob.length());
         }
 
-        return new String(returnValue);
+        return returnValue == null ? "" : new String(returnValue);
     }
 }
