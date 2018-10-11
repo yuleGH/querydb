@@ -74,12 +74,12 @@
                     <when test="customCondition.startDateVal != null and customCondition.startDateVal != ''">
                         <choose>
                             <when test="customCondition.customConditionEnumCode == 'between'">
-                                to_char(${customCondition.columnName}, 'yyyy/MM/dd hh24:mi:ss') >= #{customCondition.startDateVal}
-                                and to_char(${customCondition.columnName}, 'yyyy/MM/dd hh24:mi:ss') &lt;= #{customCondition.endDateVal}
+                                to_char(${customCondition.columnName}, 'yyyy-MM-dd hh24:mi:ss') >= #{customCondition.startDateVal}
+                                and to_char(${customCondition.columnName}, 'yyyy-MM-dd hh24:mi:ss') &lt;= #{customCondition.endDateVal}
                             </when>
                             <when test="customCondition.customConditionEnumCode == 'notBetween'">
-                                to_char(${customCondition.columnName}, 'yyyy/MM/dd hh24:mi:ss') &lt; #{customCondition.startDateVal}
-                                and to_char(${customCondition.columnName}, 'yyyy/MM/dd hh24:mi:ss') > #{customCondition.endDateVal}
+                                to_char(${customCondition.columnName}, 'yyyy-MM-dd hh24:mi:ss') &lt; #{customCondition.startDateVal}
+                                and to_char(${customCondition.columnName}, 'yyyy-MM-dd hh24:mi:ss') > #{customCondition.endDateVal}
                             </when>
                         </choose>
                     </when>
