@@ -1,4 +1,7 @@
-﻿//====================分页组件封装=====================
+﻿/**
+ * 封装分页组件
+ * @type {{data: (function(): {pageSize: number, url: string, autoLoad: boolean, currentPage: number, currentPageNum: string, param: {}, queryParams: {}, total: number, pageData: Array, field: null, direction: null, loading: boolean}), methods: {sortChange: commonPageBar.methods.sortChange, currentChange: commonPageBar.methods.currentChange, handleSizeChange: commonPageBar.methods.handleSizeChange, $_buildPaginationParam: commonPageBar.methods.$_buildPaginationParam, $_dealParamsByTrim: (function(*=)), $_callbackAfterLoadData: commonPageBar.methods.$_callbackAfterLoadData, $_loadData: commonPageBar.methods.$_loadData, sortLoad: commonPageBar.methods.sortLoad, reload: commonPageBar.methods.reload, refresh: commonPageBar.methods.refresh, refreshByDeleteRow: commonPageBar.methods.refreshByDeleteRow}, created: commonPageBar.created}}
+ */
 var commonPageBar = {
     data: function () {
         return {
