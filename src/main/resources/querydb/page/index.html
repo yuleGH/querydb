@@ -79,14 +79,26 @@
                                  :handle-query-table-data-by-condition="handleQueryTableDataByCondition"></custom-conditions-component>
 
     <el-row :gutter="20" class="m-b20">
-        <el-col>
+        <el-col :span="12">
             <el-button type="primary" @click="handleQueryTableDataByCondition">根据条件查询数据</el-button>
             <el-button type="primary" @click="handleExportTableDataByCondition">根据条件导出</el-button>
+            <el-button type="primary" @click="showSelectTableColumnHtml = !showSelectTableColumnHtml">显示/隐藏自定义指定显示字段</el-button>
+        </el-col>
+
+        <el-col :span="12" v-show="showSelectTableColumnHtml">
+            <el-select v-model="tableShowColumnIds" filterable multiple placeholder="自定义指定显示字段">
+                <el-option
+                        v-for="item in tableColumns"
+                        :key="item.id"
+                        :label="item.label"
+                        :value="item.id">
+                </el-option>
+            </el-select>
         </el-col>
     </el-row>
 
     <!--表格数据-->
-    <table-component ref="tableRef" :table-columns="tableColumns"></table-component>
+    <table-component ref="tableRef" :table-columns="tableShowColumnIdsComputed"></table-component>
 </div>
 
 <!-- 引入组件库 -->
@@ -112,6 +124,7 @@ require(["/front/js/common/require-main.js"], function(){
             el: "#app",
             data: {
                 showTableConditionHtml: false,//显示默认查询条件
+                showSelectTableColumnHtml: false,//显示自定义显示查询条件
 
                 tableNameOptions: [], //表下拉框
                 tableNameSelect: '', //表下拉框选中数据
@@ -122,6 +135,7 @@ require(["/front/js/common/require-main.js"], function(){
                 tableName: '', //当前查询的表名
 
                 tableColumns: [], //表格列名（当前表的所有表字段）
+                tableShowColumnIds: [],//表格列明（当前列表显示字段）
                 tableConditions: [], //表格查询条件
                 customConditionArray: [],  //表格自定义查询条件
 
@@ -157,6 +171,14 @@ require(["/front/js/common/require-main.js"], function(){
                     });
                 });
             },
+            computed: {
+                tableShowColumnIdsComputed: function(){
+                    const _self = this;
+                    return _self.tableColumns.filter(function(column){
+                        return _self.tableShowColumnIds.indexOf(column.id) >= 0;
+                    });
+                }
+            },
             components: {
                 'table-component': function (resolve) {
                     require([ '/front/page/component/table.js'], resolve);
@@ -182,6 +204,7 @@ require(["/front/js/common/require-main.js"], function(){
                         backFunction: function (tableNameList) {
                             _self.tableNameSelect = "";
                             _self.tableColumns = [];
+                            _self.tableShowColumnIds = [];
                             _self.tableConditions = [];
                             _self.customConditionArray = [];
                             _self.tableNameOptions = tableNameList;
@@ -215,6 +238,7 @@ require(["/front/js/common/require-main.js"], function(){
                 $_drawTable(tableColList) {
                     const _self = this;
                     _self.tableColumns = [];
+                    _self.tableShowColumnIds = [];
                     for (let i = 0; i < tableColList.length; i++) {
                         let item = tableColList[i];
                         _self.tableColumns.push({
@@ -223,6 +247,7 @@ require(["/front/js/common/require-main.js"], function(){
                             prop: item.columnName,
                             label: item.columnName + "：" + item.comments
                         });
+                        _self.tableShowColumnIds.push(item.columnName);
                         _self.$refs.tableRef.clearTable();
                     }
                 },
