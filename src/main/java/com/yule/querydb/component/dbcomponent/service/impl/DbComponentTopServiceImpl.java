@@ -95,7 +95,7 @@ public class DbComponentTopServiceImpl implements DbComponentTopService {
             }
         }
 
-        List<Map<String, String>> tableData = getTableDataList(0, Integer.MAX_VALUE, field, direction, tableName, tableConditionsJson, customConditionsJson);
+        List<Map<String, String>> tableData = getTableDataList(0, 10000, field, direction, tableName, tableConditionsJson, customConditionsJson);
 
         try {
             ExportExcelUtil.exportExcel(request, response, tableName, headerList, fieldList, tableData);

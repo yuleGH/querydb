@@ -94,6 +94,7 @@
                         :value="item.id">
                 </el-option>
             </el-select>
+            <el-button type="primary" @click="tableShowColumnIds = []">清空显示字段</el-button>
         </el-col>
     </el-row>
 
@@ -124,7 +125,7 @@ require(["/front/js/common/require-main.js"], function(){
             el: "#app",
             data: {
                 showTableConditionHtml: false,//显示默认查询条件
-                showSelectTableColumnHtml: false,//显示自定义显示查询条件
+                showSelectTableColumnHtml: false,//显示自定义显示列字段
 
                 tableNameOptions: [], //表下拉框
                 tableNameSelect: '', //表下拉框选中数据
@@ -135,7 +136,7 @@ require(["/front/js/common/require-main.js"], function(){
                 tableName: '', //当前查询的表名
 
                 tableColumns: [], //表格列名（当前表的所有表字段）
-                tableShowColumnIds: [],//表格列明（当前列表显示字段）
+                tableShowColumnIds: [],//表格列名（当前列表显示字段）
                 tableConditions: [], //表格查询条件
                 customConditionArray: [],  //表格自定义查询条件
 
@@ -341,7 +342,7 @@ require(["/front/js/common/require-main.js"], function(){
                         return;
                     }
 
-                    this.$confirm('导出请慎重, 数据量太大会影响系统性能，是否继续?', '提示', {
+                    this.$confirm('导出请慎重, 数据量太大会影响系统性能，是否继续导出前10000条数据?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
