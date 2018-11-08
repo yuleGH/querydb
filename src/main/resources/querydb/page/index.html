@@ -85,7 +85,7 @@
             <el-button type="primary" @click="showSelectTableColumnHtml = !showSelectTableColumnHtml">显示/隐藏自定义指定显示字段</el-button>
         </el-col>
 
-        <el-col :span="12" v-show="showSelectTableColumnHtml">
+        <el-col :span="9" v-show="showSelectTableColumnHtml">
             <el-select v-model="tableShowColumnIds" filterable multiple placeholder="自定义指定显示字段">
                 <el-option
                         v-for="item in tableColumns"
@@ -94,6 +94,9 @@
                         :value="item.id">
                 </el-option>
             </el-select>
+        </el-col>
+
+        <el-col :span="3" v-show="showSelectTableColumnHtml">
             <el-button type="primary" @click="tableShowColumnIds = []">清空显示字段</el-button>
         </el-col>
     </el-row>
